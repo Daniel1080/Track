@@ -5,5 +5,5 @@ package com.example.daniel.track;
  */
 
 public interface reg_user {
-    public boolean RegUsr();
+    public boolean RegUsr(String User, String email, String pass);
 }

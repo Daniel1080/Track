@@ -17,4 +17,13 @@ public class MainActivity extends AppCompatActivity {
         Intent intent= new Intent(this, Register.class);
         startActivity(intent);
     }
+
+
+
+
+
+
 }
+
+
+
