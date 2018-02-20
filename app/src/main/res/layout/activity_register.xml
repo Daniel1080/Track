@@ -17,41 +17,48 @@
             android:orientation="vertical">
 
             <EditText
-                android:id="@+id/editText"
+                android:id="@+id/txtName"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:ems="10"
                 android:hint="Name"
-                android:inputType="textPersonName"
-                />
+                android:inputType="textPersonName" />
 
             <EditText
-                android:id="@+id/editText2"
+                android:id="@+id/txtUserR"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:ems="10"
+                android:hint="User"
+                android:inputType="textPersonName" />
+
+            <EditText
+                android:id="@+id/txtEmail"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:ems="10"
                 android:hint="email"
-                android:inputType="textEmailAddress"/>
+                android:inputType="textEmailAddress" />
 
             <EditText
-                android:id="@+id/editText3"
+                android:id="@+id/txtPass"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:ems="10"
                 android:hint="pass"
-                android:inputType="textPassword"/>
+                android:inputType="textPassword" />
 
             <Button
-                android:id="@+id/button"
+                android:id="@+id/btnRegister"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:text="Button"/>
+                android:text="@string/Register" />
 
             <Button
-                android:id="@+id/button2"
+                android:id="@+id/btnBack"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:text="Button"/>
+                android:text="@string/Back" />
         </LinearLayout>
     </ScrollView>
 </android.support.constraint.ConstraintLayout>
