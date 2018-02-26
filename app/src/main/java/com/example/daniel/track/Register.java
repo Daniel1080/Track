@@ -48,10 +48,10 @@ public class Register extends AppCompatActivity{
 
                 boolean InputsOk = false;
 
-                User = txtUser.toString();
-                Pass = txtPass.toString();
-                Email = txtEmail.toString();
-                Name = txtName.toString();
+                User = txtUser.getText().toString();
+                Pass = txtPass.getText().toString();
+                Email = txtEmail.getText().toString();
+                Name = txtName.getText().toString();
 
                 InputsOk = chkInputs(User, Pass, Email, Name);
 

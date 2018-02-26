@@ -1,16 +1,30 @@
 package com.example.daniel.track;
 
+import android.net.SSLCertificateSocketFactory;
 import android.os.AsyncTask;
 
+import org.apache.http.conn.ssl.X509HostnameVerifier;
 import org.json.JSONException;
 import org.json.JSONObject;
 
+import java.io.BufferedReader;
+import java.io.DataOutput;
+import java.io.DataOutputStream;
 import java.io.File;
+import java.io.IOException;
+import java.io.InputStream;
+import java.io.InputStreamReader;
+import java.io.OutputStream;
+import java.net.HttpURLConnection;
+import java.net.MalformedURLException;
 import java.net.URL;
 import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
 
+import javax.net.ssl.HostnameVerifier;
 import javax.net.ssl.HttpsURLConnection;
+import javax.net.ssl.SSLSession;
+import javax.net.ssl.SSLSocketFactory;
 
 /**
  * Created by Daniel on 13/02/2018.
@@ -93,8 +107,7 @@ public class User implements reg_user {
         String BackendURL = "https://35.178.101.198";
 
         try{
-        UsrJS.put("req", 1);
-        UsrJS.put("userid", us.getUserID());
+        UsrJS.put("task", 1);
         UsrJS.put("user",us.getUser());
         UsrJS.put("name", us.getName());
         UsrJS.put("email", us.getEmail());
@@ -104,8 +117,42 @@ public class User implements reg_user {
         catch (JSONException e){
         System.out.println("Exception Occurred on writing user to JSON");
         }
-        //URL url = new URL(BackendURL, 3000, UsrJS);
-        //HttpsURLConnection Connection = (HttpsURLConnection)
+
+
+
+        try {
+            HostnameVerifier hostnameVerifier = org.apache.http.conn.ssl.SSLSocketFactory.ALLOW_ALL_HOSTNAME_VERIFIER;
+            String result  = "";
+            URL url = new URL("https://35.176.133.209/");
+            HttpsURLConnection conn = (HttpsURLConnection) url.openConnection();
+            conn.setDoOutput(true);
+            conn.setDoInput(true);
+            conn.setRequestProperty("Content-Type", "application/json");
+            conn.setRequestMethod("POST");
+            conn.setSSLSocketFactory(SSLCertificateSocketFactory.getInsecure(0, null));
+            conn.setHostnameVerifier(hostnameVerifier);
+            DataOutputStream out = new DataOutputStream(conn.getOutputStream());
+            out.writeBytes(UsrJS.toString());
+            conn.connect();
+
+            if(conn.getResponseCode() == 200){
+                InputStream input = conn.getInputStream();
+                BufferedReader reader = new BufferedReader(new InputStreamReader(input));
+                String line;
+                while ((line = reader.readLine())!= null){
+                    result.concat(line);
+                }
+                System.out.println(line);
+            }
+
+            System.out.println(result);
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+
+
+
+
 
 
     }
