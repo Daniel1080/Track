@@ -61,12 +61,12 @@ public class MainActivity extends AppCompatActivity {
         System.out.println(txtPass);
         System.out.println(Usr);
 
-        if (Usr.toString() == ""){
+        if (Usr.trim().length() < 1){
             Authed = false;
             Toast.makeText(getApplicationContext(), "Please enter a username!",Toast.LENGTH_LONG).show();
             txtPass.setText("");
         }
-        if(Pass.toString() == ""){
+        if(Pass.trim().length() < 1){
             Authed = false;
             Toast.makeText(getApplicationContext(), "Please enter a password!", Toast.LENGTH_LONG).show();
         }

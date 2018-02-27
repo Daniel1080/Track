@@ -70,6 +70,8 @@ public class User implements reg_user , login{
     }
     public Boolean LoginUser(String username, String Pass){
 
+        AUTH = false;
+
         Boolean Authenticated = false;
 
         byte [] hashPass2 = null;
