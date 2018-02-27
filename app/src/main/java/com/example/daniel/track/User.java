@@ -3,34 +3,26 @@ package com.example.daniel.track;
 import android.net.SSLCertificateSocketFactory;
 import android.os.AsyncTask;
 
-import org.apache.http.conn.ssl.X509HostnameVerifier;
 import org.json.JSONException;
 import org.json.JSONObject;
 
 import java.io.BufferedReader;
-import java.io.DataOutput;
 import java.io.DataOutputStream;
-import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
-import java.io.OutputStream;
-import java.net.HttpURLConnection;
-import java.net.MalformedURLException;
 import java.net.URL;
 import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
 
 import javax.net.ssl.HostnameVerifier;
 import javax.net.ssl.HttpsURLConnection;
-import javax.net.ssl.SSLSession;
-import javax.net.ssl.SSLSocketFactory;
 
 /**
  * Created by Daniel on 13/02/2018.
  */
 
-public class User implements reg_user {
+public class User implements reg_user , login{
 
     int UserID;
     private int UserCount =0;
@@ -38,6 +30,7 @@ public class User implements reg_user {
     String name;
     String email;
     byte [] pass;
+    Boolean AUTH = false;
 
     private int getUserID() {
         return UserID;
@@ -74,6 +67,35 @@ public class User implements reg_user {
     }
     public void CallReg(String User, String Name, String email, String pass){
         new BackgroundReg().execute(User, Name, email, pass);
+    }
+    public Boolean LoginUser(String username, String Pass){
+
+        Boolean Authenticated = false;
+
+        byte [] hashPass2 = null;
+
+              hashPass2  = HashPass(Pass);
+
+        JSONObject LoginReq = new JSONObject();
+
+
+        try {
+            LoginReq.put("task" , "2");
+            LoginReq.put("pass" , hashPass2);
+            LoginReq.put("user" , username);
+        } catch (JSONException e) {
+            e.printStackTrace();
+        }
+
+        new BackgroundLogin().execute(LoginReq);
+
+        if (AUTH){Authenticated = true;}
+        if (AUTH = false){Authenticated = false;}
+
+
+        return Authenticated;
+
+
     }
 
     public boolean RegUsr(String User, String Name, String email, String pass){
@@ -122,7 +144,7 @@ public class User implements reg_user {
 
         try {
             HostnameVerifier hostnameVerifier = org.apache.http.conn.ssl.SSLSocketFactory.ALLOW_ALL_HOSTNAME_VERIFIER;
-            String result  = "";
+            StringBuilder result = new StringBuilder();
             URL url = new URL("https://35.176.133.209/");
             HttpsURLConnection conn = (HttpsURLConnection) url.openConnection();
             conn.setDoOutput(true);
@@ -140,7 +162,7 @@ public class User implements reg_user {
                 BufferedReader reader = new BufferedReader(new InputStreamReader(input));
                 String line;
                 while ((line = reader.readLine())!= null){
-                    result.concat(line);
+                     result.append(line);
                 }
                 System.out.println(line);
             }
@@ -178,11 +200,79 @@ public class User implements reg_user {
         protected Void doInBackground(String... params) {
             System.out.println("Back Task");
             System.out.println("Params " + params[0]);
+
+
             RegUsr(params[0], params[1], params[2], params[3]);
             return null;
         }
     }
+    private class BackgroundLogin extends AsyncTask<JSONObject, Void, Void> {
+
+        public Boolean LoginOk = false;
+
+        @Override
+        protected Void doInBackground(JSONObject... params) {
+            System.out.println("Executing Background Login");
+
+            LoginOk = SendLoginReq(params[0]);
+
+
+            return null;
+        }
+
+        @Override
+        protected void onPostExecute(Void aVoid) {
+            super.onPostExecute(aVoid);
+            if (LoginOk == true){AUTH = true;}
 
 
 
-}
+        }
+    }
+    private Boolean SendLoginReq(JSONObject logreq){
+
+        Boolean LoginOK = false;
+
+        try {
+            HostnameVerifier hostnameVerifier = org.apache.http.conn.ssl.SSLSocketFactory.ALLOW_ALL_HOSTNAME_VERIFIER;
+            StringBuilder result = new StringBuilder();
+            URL url = new URL("https://35.176.133.209/");
+            HttpsURLConnection conn = (HttpsURLConnection) url.openConnection();
+            conn.setDoOutput(true);
+            conn.setDoInput(true);
+            conn.setRequestProperty("Content-Type", "application/json");
+            conn.setRequestMethod("POST");
+            conn.setSSLSocketFactory(SSLCertificateSocketFactory.getInsecure(0, null));
+            conn.setHostnameVerifier(hostnameVerifier);
+            DataOutputStream out = new DataOutputStream(conn.getOutputStream());
+            out.writeBytes(logreq.toString());
+            conn.connect();
+
+            if (conn.getResponseCode() == 200) {
+                InputStream input = conn.getInputStream();
+                BufferedReader reader = new BufferedReader(new InputStreamReader(input));
+                String line;
+                while ((line = reader.readLine()) != null) {
+                    result.append(line);
+                }
+            }
+            System.out.println(result);
+            if (result.toString() == "OK"){
+
+                LoginOK =true;
+
+            }
+        }
+        catch (IOException e) {
+            e.printStackTrace();
+        }
+
+
+
+
+        return LoginOK;
+
+        }
+
+
+ }

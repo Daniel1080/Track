@@ -17,32 +17,37 @@
             android:orientation="vertical">
 
             <EditText
-                android:id="@+id/txtUser"
+                android:id="@+id/txtUserL"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:ems="10"
-                android:inputType="textPersonName"
-                android:text="Name"/>
+                android:hint="Username"
+                android:inputType="textPersonName" />
 
             <EditText
-                android:id="@+id/txtPass"
+                android:id="@+id/txtPassL"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:ems="10"
-                android:inputType="textPassword"/>
+                android:hint="Password"
+                android:inputType="textPassword" />
+
+            <Space
+                android:layout_width="match_parent"
+                android:layout_height="100dp" />
 
             <Button
-                android:id="@+id/btnLogin"
+                android:id="@+id/btnLoginL"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:text="Login"/>
+                android:text="Login" />
 
             <Button
-                android:id="@+id/btnRegister"
+                android:id="@+id/btnRegisterL"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:onClick="switchRegister"
-                android:text="Register"/>
+                android:text="Register" />
         </LinearLayout>
     </ScrollView>
 </android.support.constraint.ConstraintLayout>

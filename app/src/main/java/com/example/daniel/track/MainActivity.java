@@ -6,11 +6,21 @@ import android.os.VibrationEffect;
 import android.os.Vibrator;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
+import android.util.Log;
 import android.view.View;
+import android.widget.Button;
 import android.widget.EditText;
+import android.widget.TextView;
+import android.widget.Toast;
 
 
 public class MainActivity extends AppCompatActivity {
+
+    Button btnLogin;
+    Button btnRegister;
+    TextView txtUser;
+    TextView txtPass;
+    Boolean Logged = false;
 
 
     @Override
@@ -18,8 +28,19 @@ public class MainActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
         User UserObj = new User();
+        Intent intent = getIntent();
+        btnLogin = (Button) findViewById(R.id.btnLoginL);
+        btnRegister = (Button) findViewById(R.id.btnRegisterL);
+        txtPass = (TextView) findViewById(R.id.txtUserL);
+        txtUser = (TextView) findViewById(R.id.txtPassL);
 
-
+        btnLogin.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                Log.i("OnClick", "Login on click executing.");
+                Logged = Login();
+            }
+        });
     }
     public void switchRegister(View view){
         Intent intent= new Intent(this, Register.class);
@@ -28,6 +49,33 @@ public class MainActivity extends AppCompatActivity {
         v.vibrate(450);
         startActivity(intent);
     }
+    public Boolean Login(){
+        Boolean Authed = false;
+
+        String Usr = txtUser.getText().toString();
+        String Pass = txtPass.getText().toString();
+
+        System.out.println("Login Method");
+        Log.i("Usr", Usr.toString());
+        Log.i("Pass", Pass.toString());
+        System.out.println(txtPass);
+        System.out.println(Usr);
+
+        if (Usr.toString() == ""){
+            Authed = false;
+            Toast.makeText(getApplicationContext(), "Please enter a username!",Toast.LENGTH_LONG).show();
+            txtPass.setText("");
+        }
+        if(Pass.toString() == ""){
+            Authed = false;
+            Toast.makeText(getApplicationContext(), "Please enter a password!", Toast.LENGTH_LONG).show();
+        }
+
+
+
+        return Authed;
+    }
+
 
 
 

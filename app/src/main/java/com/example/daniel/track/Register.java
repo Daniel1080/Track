@@ -1,6 +1,8 @@
 package com.example.daniel.track;
 
+import android.content.Context;
 import android.content.Intent;
+import android.os.Vibrator;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.view.View;
@@ -59,6 +61,13 @@ public class Register extends AppCompatActivity{
                 r.CallReg(User, Name, Email, Pass);}
                 else{System.out.println("Inputs not good");}
 
+                if (InputsOk){
+                    txtUser.setText("");
+                    txtPass.setText("");
+                    txtEmail.setText("");
+                    txtName.setText("");
+                }
+
             }
         });
     }
@@ -81,6 +90,13 @@ public class Register extends AppCompatActivity{
 
         return inputsOk;
         }
+    public void switchLogin(View view){
+        Intent intent= new Intent(this, MainActivity.class);
+        Vibrator v = (Vibrator) getSystemService(Context.VIBRATOR_SERVICE);
+
+        v.vibrate(450);
+        startActivity(intent);
+    }
 
 
 
