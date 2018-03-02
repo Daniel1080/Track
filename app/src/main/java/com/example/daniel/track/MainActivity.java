@@ -75,7 +75,8 @@ public class MainActivity extends AppCompatActivity {
 
 
         Authed = l.LoginUser(Usr, Pass);
-        Log.d("Value of Auth aflogin" , "Auth is " + Authed);
+        Log.i("Value of Auth aflogin" , "Auth is " + Authed);
+        Log.i("Value of Auth aflogin" , "Auth is " + Authed);
         return Authed;
     }
 
