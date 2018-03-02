@@ -72,8 +72,8 @@ public class User implements reg_user , login{
 
         try {
             LoginReq.put("task" , "2");
-            LoginReq.put("pass" , hashPass2);
             LoginReq.put("user" , username);
+            LoginReq.put("pass" , hashPass2);
         } catch (JSONException e) {
             e.printStackTrace();
         }
@@ -166,6 +166,7 @@ public class User implements reg_user , login{
         catch (NoSuchAlgorithmException e){
             e.printStackTrace();
         }
+        System.out.println(passBytes);
         return passBytes;
 
     }

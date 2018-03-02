@@ -21,6 +21,7 @@ public class MainActivity extends AppCompatActivity {
     TextView txtUser;
     TextView txtPass;
     Boolean Logged = false;
+    login l = new User();
 
 
     @Override
@@ -31,8 +32,8 @@ public class MainActivity extends AppCompatActivity {
         Intent intent = getIntent();
         btnLogin = (Button) findViewById(R.id.btnLoginL);
         btnRegister = (Button) findViewById(R.id.btnRegisterL);
-        txtPass = (TextView) findViewById(R.id.txtUserL);
-        txtUser = (TextView) findViewById(R.id.txtPassL);
+        txtPass = (TextView) findViewById(R.id.txtPassL);
+        txtUser = (TextView) findViewById(R.id.txtUserL);
 
         btnLogin.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -72,7 +73,7 @@ public class MainActivity extends AppCompatActivity {
         }
 
 
-
+        l.LoginUser(Usr, Pass);
         return Authed;
     }
 
