@@ -7,4 +7,5 @@ package com.example.daniel.track;
 public interface login {
 
     public Boolean LoginUser(String Username, String Password);
+
 }

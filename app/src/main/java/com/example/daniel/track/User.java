@@ -2,6 +2,7 @@ package com.example.daniel.track;
 
 import android.net.SSLCertificateSocketFactory;
 import android.os.AsyncTask;
+import android.util.Log;
 
 import org.json.JSONException;
 import org.json.JSONObject;
@@ -16,6 +17,7 @@ import java.net.URL;
 import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
 import java.util.Arrays;
+import java.util.Objects;
 
 import javax.net.ssl.HostnameVerifier;
 import javax.net.ssl.HttpsURLConnection;
@@ -80,8 +82,8 @@ public class User implements reg_user , login{
             e.printStackTrace();
         }
         new BackgroundLogin().execute(LoginReq);
-        if (AUTH){Authenticated = true;}
-        if (AUTH = false){Authenticated = false;}
+        if (AUTH == true){Authenticated = true;}
+        if (AUTH == false){Authenticated = false;}
         return Authenticated;
     }
 
@@ -219,7 +221,7 @@ public class User implements reg_user , login{
              reqUser = logreq.getString("user");
 
             reqPass = logreq.getString("pass");
-
+            Log.d("req user val" , "this is val req usrr" + reqUser);
         } catch (JSONException e) {
             e.printStackTrace();
         }
@@ -266,7 +268,7 @@ public class User implements reg_user , login{
             e.printStackTrace();
         }
 
-
+        Log.d("req user val" , "this is val req usrr" + reqUser);
         LoginOK = CheckReturn(dbUser , dbPass , reqUser, reqPass);
 
 
@@ -277,7 +279,7 @@ public class User implements reg_user , login{
     public boolean CheckReturn(String dbUser, String dbPass, String reqUser, String reqPass){
         boolean match = false;
 
-
+        Log.d("req user val" , "this is val req usrr" + reqUser);
         byte [] hashReqPass = new byte[0];
         byte [] hashDbPass = new byte[0];
 
@@ -291,9 +293,9 @@ public class User implements reg_user , login{
 
         System.out.println(hashDbPass + " " + hashReqPass);
 
-        if(reqUser == dbUser ){
+        if(Objects.equals(dbUser, reqUser)){
             System.out.println("Username matches");
-
+                match = true;
             if (Arrays.equals(hashDbPass, hashReqPass)){
 
                 System.out.println("Pass Hashes match");
@@ -302,7 +304,7 @@ public class User implements reg_user , login{
 
 
         }
-
+        Log.d("Match val " , "This is" + match);
      return match;
     }
 

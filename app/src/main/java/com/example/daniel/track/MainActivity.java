@@ -40,6 +40,7 @@ public class MainActivity extends AppCompatActivity {
             public void onClick(View view) {
                 Log.i("OnClick", "Login on click executing.");
                 Logged = Login();
+                if (Logged == true){Toast.makeText(getApplicationContext(), "User Authenticated",Toast.LENGTH_LONG).show();}
             }
         });
     }
@@ -73,7 +74,8 @@ public class MainActivity extends AppCompatActivity {
         }
 
 
-        l.LoginUser(Usr, Pass);
+        Authed = l.LoginUser(Usr, Pass);
+        Log.d("Value of Auth aflogin" , "Auth is " + Authed);
         return Authed;
     }
 
