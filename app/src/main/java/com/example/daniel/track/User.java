@@ -11,9 +11,11 @@ import java.io.DataOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
+import java.io.UnsupportedEncodingException;
 import java.net.URL;
 import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
+import java.util.Arrays;
 
 import javax.net.ssl.HostnameVerifier;
 import javax.net.ssl.HttpsURLConnection;
@@ -160,8 +162,10 @@ public class User implements reg_user , login{
 
         try{
         md = MessageDigest.getInstance("MD5");
-        md.update(befHash.getBytes());
-         passBytes = md.digest();
+
+                md.update(befHash.getBytes());
+
+            passBytes = md.digest();
         }
         catch (NoSuchAlgorithmException e){
             e.printStackTrace();
@@ -204,6 +208,22 @@ public class User implements reg_user , login{
 
         Boolean LoginOK = false;
 
+        String dbUser = "" ;
+        String dbPass = "" ;
+        String reqPass = "";
+        String reqUser = "";
+
+        try {
+
+
+             reqUser = logreq.getString("user");
+
+            reqPass = logreq.getString("pass");
+
+        } catch (JSONException e) {
+            e.printStackTrace();
+        }
+
         try {
             HostnameVerifier hostnameVerifier = org.apache.http.conn.ssl.SSLSocketFactory.ALLOW_ALL_HOSTNAME_VERIFIER;
             StringBuilder result = new StringBuilder();
@@ -226,18 +246,64 @@ public class User implements reg_user , login{
                 while ((line = reader.readLine()) != null) {
                     result.append(line);
                 }
+                System.out.println("This is the returned result from login " + result);
+                try {
+                    JSONObject ServLogRes = new JSONObject(result.toString());
+                    dbUser = ServLogRes.getString("dbuser");
+                    dbPass = ServLogRes.getString("dbpass");
+
+                    System.out.println("These are the returned values as strings " + dbUser + " " + dbPass);
+
+                } catch (JSONException e) {
+                    e.printStackTrace();
+                }
+
             }
-            System.out.println(result);
-            if (result.toString() == "OK"){
-                LoginOK =true;
-            }
+
+
         }
         catch (IOException e) {
             e.printStackTrace();
         }
+
+
+        LoginOK = CheckReturn(dbUser , dbPass , reqUser, reqPass);
+
+
         return LoginOK;
 
     }
 
+    public boolean CheckReturn(String dbUser, String dbPass, String reqUser, String reqPass){
+        boolean match = false;
+
+
+        byte [] hashReqPass = new byte[0];
+        byte [] hashDbPass = new byte[0];
+
+            hashReqPass = reqPass.getBytes();
+            hashDbPass = dbPass.getBytes();
+
+        System.out.println("dbuser is " + dbUser + " requser is " + reqUser);
+
+
+
+
+        System.out.println(hashDbPass + " " + hashReqPass);
+
+        if(reqUser == dbUser ){
+            System.out.println("Username matches");
+
+            if (Arrays.equals(hashDbPass, hashReqPass)){
+
+                System.out.println("Pass Hashes match");
+
+            }
+
+
+        }
+
+     return match;
+    }
 
  }
