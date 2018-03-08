@@ -2,5 +2,6 @@
     <string name="app_name">Track</string>
     <string name="Back">Back</string>
     <string name="Register">Register</string>
+    <string name="title_activity_maps">Map</string>
 
 </resources>
