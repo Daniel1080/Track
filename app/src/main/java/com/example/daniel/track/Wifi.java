@@ -6,5 +6,13 @@ package com.example.daniel.track;
 
 public class Wifi extends User {
 
+    public static void GetWirelessData(){
+
+
+
+
+    }
+
+
 
 }

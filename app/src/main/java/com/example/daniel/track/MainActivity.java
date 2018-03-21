@@ -41,15 +41,23 @@ public class MainActivity extends AppCompatActivity {
                 Log.i("OnClick", "Login on click executing.");
                 Logged = Login();
                 if (Logged == true){Toast.makeText(getApplicationContext(), "User Authenticated",Toast.LENGTH_LONG).show();}
+                switchMap(view);
             }
         });
     }
     public void switchRegister(View view){
         Intent intent= new Intent(this, Register.class);
         Vibrator v = (Vibrator) getSystemService(Context.VIBRATOR_SERVICE);
-
         v.vibrate(450);
         startActivity(intent);
+    }
+    public  void switchMap(View view){
+
+        Intent mapInt = new Intent(this, MapsActiv.class);
+        Vibrator v2 = (Vibrator) getSystemService(Context.VIBRATOR_SERVICE);
+        v2.vibrate(500);
+        startActivity(mapInt);
+
     }
     public Boolean Login(){
         Boolean Authed = false;
@@ -74,7 +82,7 @@ public class MainActivity extends AppCompatActivity {
         }
 
 
-        Authed = l.LoginUser(Usr, Pass);
+        Logged = l.LoginUser(Usr, Pass);
         Log.i("Value of Auth aflogin" , "Auth is " + Authed);
         Log.i("Value of Auth aflogin" , "Auth is " + Authed);
         return Authed;
