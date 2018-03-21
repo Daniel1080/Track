@@ -1,11 +1,15 @@
 package com.example.daniel.track;
 
+import android.content.Context;
 import android.content.Intent;
+import android.net.ConnectivityManager;
+import android.net.NetworkInfo;
 import android.support.v4.app.FragmentActivity;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.util.Log;
 import android.widget.Switch;
+import android.widget.Toast;
 
 import com.google.android.gms.maps.CameraUpdate;
 import com.google.android.gms.maps.CameraUpdateFactory;
@@ -22,6 +26,8 @@ public class MapsActiv extends FragmentActivity implements OnMapReadyCallback{
 
     GoogleMap mMap;
     Switch togTrk;
+    ConnectivityManager conMgr;
+
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -29,11 +35,10 @@ public class MapsActiv extends FragmentActivity implements OnMapReadyCallback{
         Intent intent = getIntent();
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_maps);
-
-        togTrk = (Switch) findViewById(R.id.swTrk);
-
         SupportMapFragment mapFragment = (SupportMapFragment) getSupportFragmentManager().findFragmentById(R.id.mapView);
         mapFragment.getMapAsync(this);
+        togTrk = (Switch) findViewById(R.id.swTrk);
+        conMgr =  (ConnectivityManager) getSystemService(Context.CONNECTIVITY_SERVICE);
 
         toggleTracking();
 
@@ -50,7 +55,13 @@ public class MapsActiv extends FragmentActivity implements OnMapReadyCallback{
     public void toggleTracking(){
 
     Log.d("Running tracking check!", "toggle Tracking function called. ");
-    if(togTrk.isChecked() == true){};
+    if(togTrk.isChecked() == true){
+        Toast.makeText(this, "Tracking toggled!", Toast.LENGTH_SHORT).show();};
+        NetworkInfo netInf = conMgr.getActiveNetworkInfo();
+        Log.d("NetConn", "con mgr started" + netInf);
+
+
+
 
 
 
