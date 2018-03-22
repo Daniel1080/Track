@@ -57,9 +57,10 @@ public class MapsActiv extends FragmentActivity implements OnMapReadyCallback{
     }
     @Override
     public void onMapReady(GoogleMap googleMap) {
-        LatLng sydney = new LatLng(-33.852, 151.211);
-        googleMap.addMarker(new MarkerOptions().position(sydney).title("Down Under"));
-        googleMap.moveCamera(CameraUpdateFactory.newLatLng(sydney));
+        LatLng Sunderland = new LatLng(54.90465, -1.38222);
+        googleMap.addMarker(new MarkerOptions().position(Sunderland).title("Sun"));
+        googleMap.moveCamera(CameraUpdateFactory.newLatLng(Sunderland));
+
 
     }
 
@@ -69,7 +70,7 @@ public class MapsActiv extends FragmentActivity implements OnMapReadyCallback{
     if(togTrk.isChecked() == true){
         Toast.makeText(this, "Tracking toggled!", Toast.LENGTH_SHORT).show();};
         NetworkInfo netInf = conMgr.getActiveNetworkInfo();
-        Log.d("NetConn", "con mgr started" + netInf);
+        Log.d("NetConn", "con mgr started " + netInf);
         Log.d("Current Net", netInf.getState().toString());
         String conStat = netInf.getState().toString();
         System.out.println(conStat);
