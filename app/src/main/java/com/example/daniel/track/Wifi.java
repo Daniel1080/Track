@@ -14,9 +14,11 @@ import com.loopj.android.http.AsyncHttpClient;
 import com.loopj.android.http.JsonHttpResponseHandler;
 import com.loopj.android.http.RequestParams;
 
+import org.json.JSONException;
 import org.json.JSONObject;
 
 import java.io.IOException;
+import java.lang.reflect.Array;
 import java.net.MalformedURLException;
 import java.net.ProtocolException;
 import java.net.URL;
@@ -45,6 +47,7 @@ public class Wifi extends User {
 
 
     public static String APurl = "https://api.wigle.net/api/v2/network/detail";
+    public Boolean success = false;
 
 
     public boolean GetWirelessData1(Context cont){
@@ -85,7 +88,7 @@ public class Wifi extends User {
         APhm.put("AP2LAT", "");
         APhm.put("AP3", wifiLis.get(2).SSID);
         APhm.put("AP3TIME" , time);
-        APhm.put("AP3BSSID", wifiLis.get(2).BSSID.toString());
+        APhm.put("AP3BSSID", wifiLis.get(2).BSSID.toString().replace(":", "%"));
         APhm.put("AP3LEVEL", wifiLis.get(2).level);
         APhm.put("AP3LON" , "");
         APhm.put("AP3LAT", "");
@@ -105,30 +108,58 @@ public class Wifi extends User {
 
     public HashMap GetApLocations2(HashMap APs){
 
-        GetLocGetReq(APs);
+
+
+        int x = 0;
+        HashMap APstoProc = new HashMap();
+        APstoProc.put("AP1BSSID", APs.get("AP1BSSID"));
+        APstoProc.put("AP2BSSID", APs.get("AP2BSSID"));
+        APstoProc.put("AP3BSSID", APs.get("AP3BSSID"));
+
+        while(x < 3){
+
+            switch (x) {
+                case 1: GetLocGetReq(APs.get("AP1BSSID").toString(), x, success);
+                break;
+                case 2: GetLocGetReq(APs.get("AP2BSSID").toString(), x, success);
+                break;
+                case 3: GetLocGetReq(APs.get("AP3BSSID").toString(), x, success);
+            }
+
+            x+=x;
+
+
+        }
 
         return APs;
 
     }
 
-    public void GetLocGetReq(HashMap APs){
+    public HashMap GetLocGetReq(String CurrAP, int APnum, boolean success){
 
         RequestParams params = new RequestParams();
+        final HashMap ProcessedAp = new HashMap();
 
 
-        params.put("netid", APs.get("AP1BSSID"));
 
 
         AsyncHttpClient client = new AsyncHttpClient();
         client.setBasicAuth("AID5de8eada7ff8fd72337913007b346e1f", "b9da51d6f0621b4dd95fa517da6a932d", new AuthScope(AuthScope.ANY_REALM, AuthScope.ANY_PORT));
 
-        String CurrURL = "https://api.wigle.net/api/v2/network/search?onlymine=false&freenet=false&paynet=false&netid="; // Add ap BSSID
+        String CurrURL = "https://api.wigle.net/api/v2/network/search?onlymine=false&freenet=true&paynet=true&netid=" + CurrAP; // Add ap BSSID
 
         client.get(CurrURL, params, new JsonHttpResponseHandler() {
 
             @Override
             public void onSuccess(int statusCode, Header[] headers, JSONObject response){
             Log.d("Track", "Great Success" + response.toString());
+                try {
+                    ProcessedAp.put("ERROR", response.get("message"));
+
+                } catch (JSONException e) {
+                    e.printStackTrace();
+                }
+
 
             }
 
@@ -138,6 +169,11 @@ public class Wifi extends User {
             }
         });
 
+
+        if(ProcessedAp.get("ERROR").toString().contains("fails")){success = false;  }
+
+
+        return ProcessedAp;
     }
 
 
