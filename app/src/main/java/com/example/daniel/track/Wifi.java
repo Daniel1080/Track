@@ -1,40 +1,23 @@
 package com.example.daniel.track;
 
-import android.content.BroadcastReceiver;
 import android.content.Context;
-import android.content.Intent;
-import android.content.IntentFilter;
-import android.net.SSLCertificateSocketFactory;
 import android.net.wifi.ScanResult;
 import android.net.wifi.WifiManager;
-import android.preference.PreferenceActivity;
+import android.os.AsyncTask;
 import android.util.Log;
 
 import com.loopj.android.http.AsyncHttpClient;
 import com.loopj.android.http.JsonHttpResponseHandler;
 import com.loopj.android.http.RequestParams;
 
-import org.json.JSONException;
 import org.json.JSONObject;
 
-import java.io.IOException;
-import java.lang.reflect.Array;
-import java.net.MalformedURLException;
-import java.net.ProtocolException;
-import java.net.URL;
-import java.util.ArrayList;
 import java.util.Calendar;
-import java.util.Collection;
 import java.util.Collections;
 import java.util.Comparator;
 import java.util.Date;
-import java.util.Dictionary;
 import java.util.HashMap;
 import java.util.List;
-import java.util.concurrent.TimeUnit;
-
-import javax.net.ssl.HostnameVerifier;
-import javax.net.ssl.HttpsURLConnection;
 
 import cz.msebera.android.httpclient.Header;
 import cz.msebera.android.httpclient.auth.AuthScope;
@@ -48,135 +31,128 @@ public class Wifi extends User {
 
     public static String APurl = "https://api.wigle.net/api/v2/network/detail";
     public Boolean success = false;
+    WifiManager wifiMan;
 
 
-    public boolean GetWirelessData1(Context cont){
-        WifiManager wifiMan = (WifiManager) cont.getSystemService(cont.WIFI_SERVICE);
-        wifiMan.setWifiEnabled(true);
-        Date time = Calendar.getInstance().getTime();
-        wifiMan.startScan();
+    public boolean GetWireless1(Context cont)
+    {
 
+        Boolean Processed = false;
+        wifiMan = (WifiManager) cont.getSystemService(cont.WIFI_SERVICE);
 
-        Comparator<ScanResult> comparator = new Comparator<ScanResult>() {
-            @Override
-            public int compare(ScanResult lhs, ScanResult rhs) {
-                return (lhs.level > rhs.level ? -1 : (lhs.level == rhs.level ? 0 : 1));
-            }
-        };
+        AsyncGetWifiNet a = new AsyncGetWifiNet();
 
+        a.execute();
 
-
-
-        List <ScanResult> wifiLis = wifiMan.getScanResults();
-        Collections.sort(wifiLis, comparator);
-
-        //if(wifiLis.isEmpty() == true){return false;}
-
-        HashMap APhm = new HashMap();
-
-        APhm.put("AP1", wifiLis.get(0).SSID);
-        APhm.put("AP1TIME" , time);
-        APhm.put("AP1BSSID", wifiLis.get(0).BSSID.toString().replace(":", "%"));
-        APhm.put("AP1LEVEL", wifiLis.get(0).level );
-        APhm.put("AP1LON" , "");
-        APhm.put("AP1LAT", "");
-        APhm.put("AP2", wifiLis.get(1).SSID);
-        APhm.put("AP2TIME" , time);
-        APhm.put("AP2BSSID", wifiLis.get(1).BSSID.toString().replace(":", "%"));
-        APhm.put("AP2LEVEL", wifiLis.get(1).level);
-        APhm.put("AP2LON" , "");
-        APhm.put("AP2LAT", "");
-        APhm.put("AP3", wifiLis.get(2).SSID);
-        APhm.put("AP3TIME" , time);
-        APhm.put("AP3BSSID", wifiLis.get(2).BSSID.toString().replace(":", "%"));
-        APhm.put("AP3LEVEL", wifiLis.get(2).level);
-        APhm.put("AP3LON" , "");
-        APhm.put("AP3LAT", "");
-
-
-        System.out.println("This is the first network :::: " + wifiLis.get(0).SSID.toString());
-        System.out.println(APhm.get("AP1BSSID") + " " + APhm.get("AP2BSSID")  + " " + APhm.get("AP3BSSID"));
-
-        //while (APhm.get("m1LON""))
-
-        GetApLocations2(APhm);
-
-        return true;
-
+        return Processed;
     }
 
+    private class AsyncGetWifiNet extends AsyncTask<HashMap, Boolean, String> {
 
-    public HashMap GetApLocations2(HashMap APs){
+        HashMap APhm = new HashMap();
+        String Resp = "";
+        AsyncHttpClient client = new AsyncHttpClient();
+
+
+        @Override
+        protected String doInBackground(HashMap... hashMaps) {
+
+            Date time = Calendar.getInstance().getTime();
 
 
 
-        int x = 0;
-        HashMap APstoProc = new HashMap();
-        APstoProc.put("AP1BSSID", APs.get("AP1BSSID"));
-        APstoProc.put("AP2BSSID", APs.get("AP2BSSID"));
-        APstoProc.put("AP3BSSID", APs.get("AP3BSSID"));
 
-        while(x < 3){
+            wifiMan.setWifiEnabled(true);
+            wifiMan.startScan();
 
-            switch (x) {
-                case 1: GetLocGetReq(APs.get("AP1BSSID").toString(), x, success);
-                break;
-                case 2: GetLocGetReq(APs.get("AP2BSSID").toString(), x, success);
-                break;
-                case 3: GetLocGetReq(APs.get("AP3BSSID").toString(), x, success);
+            //Setup comparator to sort wireless results by signal strength.
+            Comparator<ScanResult> comparator = new Comparator<ScanResult>() {
+                @Override
+                public int compare(ScanResult lhs, ScanResult rhs) {
+                    return (lhs.level > rhs.level ? -1 : (lhs.level == rhs.level ? 0 : 1));
+                }
+            };
+
+            //Get Wifi scan results from Wifi man
+            List <ScanResult> wifiLis = wifiMan.getScanResults();
+            //Sort Wifi scan results by comparator.
+            Collections.sort(wifiLis, comparator);
+            if(wifiLis.isEmpty()){Log.d("WIFI", "No Wireless networks found!");}
+
+            APhm.put("AP1", wifiLis.get(0).SSID);
+            APhm.put("AP1TIME" , time);
+            APhm.put("AP1BSSID", wifiLis.get(0).BSSID.toString());
+            APhm.put("AP1LEVEL", wifiLis.get(0).level );
+            APhm.put("AP1LON" , "");
+            APhm.put("AP1LAT", "");
+            APhm.put("AP2", wifiLis.get(1).SSID);
+            APhm.put("AP2TIME" , time);
+            APhm.put("AP2BSSID", wifiLis.get(1).BSSID.toString().replace(":", "%"));
+            APhm.put("AP2LEVEL", wifiLis.get(1).level);
+            APhm.put("AP2LON" , "");
+            APhm.put("AP2LAT", "");
+            APhm.put("AP3", wifiLis.get(2).SSID);
+            APhm.put("AP3TIME" , time);
+            APhm.put("AP3BSSID", wifiLis.get(2).BSSID.toString().replace(":", "%"));
+            APhm.put("AP3LEVEL", wifiLis.get(2).level);
+            APhm.put("AP3LON" , "");
+            APhm.put("AP3LAT", "");
+
+            System.out.println("This is the first network :::: " + wifiLis.get(0).SSID.toString());
+            System.out.println(APhm.get("AP1BSSID") + " " + APhm.get("AP2BSSID")  + " " + APhm.get("AP3BSSID"));
+
+            if(APhm.isEmpty()){Resp = "FAIL";
+            Log.d("ASYNC", "Method " + Resp);
+            }
+            else if (APhm.isEmpty() == false){Resp = "SUCCESS";
+            Log.d("ASYNC", "Method " + Resp);
             }
 
-            x+=x;
+
+            return Resp;
+        }
+
+        @Override
+        protected void onPostExecute(String Resp) {
+
+            Log.i("BSSID", "This is the mac to be looked up" + APhm.get("AP1BSSID"));
+            RequestParams params = new RequestParams();
+            params.put("netid" , APhm.get("AP1BSSID"));
+
+            if(Resp.equals("SUCCESS")){
+                Log.i("GET", "Executing Get Req.");
+                client.setBasicAuth("AID5de8eada7ff8fd72337913007b346e1f", "b9da51d6f0621b4dd95fa517da6a932d", new AuthScope(AuthScope.ANY_REALM, AuthScope.ANY_PORT));
+                client.get(APurl, params, new JsonHttpResponseHandler(){
+
+                    @Override
+                    public void onSuccess(int statusCode, Header[] headers, JSONObject response){
+                        Log.d("Track", "Great Success" + response.toString());
+
+
+                    }
+
+                    @Override
+                    public void onFailure(int statusCode, Header[] headers, Throwable e, JSONObject response){
+                        Log.d("Track", "Fail" + e.toString());
+                    }
+
+
+
+                });
+
+
+
+
+
+            }
+
+
 
 
         }
 
-        return APs;
 
     }
-
-    public HashMap GetLocGetReq(String CurrAP, int APnum, boolean success){
-
-        RequestParams params = new RequestParams();
-        final HashMap ProcessedAp = new HashMap();
-
-
-
-
-        AsyncHttpClient client = new AsyncHttpClient();
-        client.setBasicAuth("AID5de8eada7ff8fd72337913007b346e1f", "b9da51d6f0621b4dd95fa517da6a932d", new AuthScope(AuthScope.ANY_REALM, AuthScope.ANY_PORT));
-
-        String CurrURL = "https://api.wigle.net/api/v2/network/search?onlymine=false&freenet=true&paynet=true&netid=" + CurrAP; // Add ap BSSID
-
-        client.get(CurrURL, params, new JsonHttpResponseHandler() {
-
-            @Override
-            public void onSuccess(int statusCode, Header[] headers, JSONObject response){
-            Log.d("Track", "Great Success" + response.toString());
-                try {
-                    ProcessedAp.put("ERROR", response.get("message"));
-
-                } catch (JSONException e) {
-                    e.printStackTrace();
-                }
-
-
-            }
-
-            @Override
-            public void onFailure(int statusCode, Header [] headers, Throwable e, JSONObject response){
-                Log.d("Track", "Fail" + e.toString());
-            }
-        });
-
-
-        if(ProcessedAp.get("ERROR").toString().contains("fails")){success = false;  }
-
-
-        return ProcessedAp;
-    }
-
-
 
 
 

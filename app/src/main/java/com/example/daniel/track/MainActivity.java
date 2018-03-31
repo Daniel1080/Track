@@ -39,7 +39,7 @@ public class MainActivity extends AppCompatActivity {
             @Override
             public void onClick(View view) {
                 Log.i("OnClick", "Login on click executing.");
-                Logged = Login();
+               // Logged = Login();
                 if (Logged == true){Toast.makeText(getApplicationContext(), "User Authenticated",Toast.LENGTH_LONG).show();}
                 switchMap(view);
             }

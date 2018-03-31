@@ -45,7 +45,12 @@ public class MapsActiv extends FragmentActivity implements OnMapReadyCallback{
             @Override
             public void onCheckedChanged(CompoundButton compoundButton, boolean isChecked) {
 
-                if(isChecked){toggleTracking();}
+                if(isChecked){
+
+
+                    toggleTracking();
+
+                }
 
 
             }
@@ -78,7 +83,7 @@ public class MapsActiv extends FragmentActivity implements OnMapReadyCallback{
         if(conStat == "CONNECTED"){Log.i("NetStatus", "Device has network access!");
         Toast.makeText(this, "Connected!", Toast.LENGTH_LONG);
         Context WCont = this;
-        w.GetWirelessData1(WCont);
+        w.GetWireless1(WCont);
 
         }
         else{Toast.makeText(this , "Check Internet Connectivity!", Toast.LENGTH_LONG);}
