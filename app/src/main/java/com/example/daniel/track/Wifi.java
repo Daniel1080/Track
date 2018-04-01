@@ -10,6 +10,7 @@ import com.loopj.android.http.AsyncHttpClient;
 import com.loopj.android.http.JsonHttpResponseHandler;
 import com.loopj.android.http.RequestParams;
 
+import org.json.JSONException;
 import org.json.JSONObject;
 
 import java.util.Calendar;
@@ -87,13 +88,13 @@ public class Wifi extends User {
             APhm.put("AP1LAT", "");
             APhm.put("AP2", wifiLis.get(1).SSID);
             APhm.put("AP2TIME" , time);
-            APhm.put("AP2BSSID", wifiLis.get(1).BSSID.toString().replace(":", "%"));
+            APhm.put("AP2BSSID", wifiLis.get(1).BSSID.toString());
             APhm.put("AP2LEVEL", wifiLis.get(1).level);
             APhm.put("AP2LON" , "");
             APhm.put("AP2LAT", "");
             APhm.put("AP3", wifiLis.get(2).SSID);
             APhm.put("AP3TIME" , time);
-            APhm.put("AP3BSSID", wifiLis.get(2).BSSID.toString().replace(":", "%"));
+            APhm.put("AP3BSSID", wifiLis.get(2).BSSID.toString());
             APhm.put("AP3LEVEL", wifiLis.get(2).level);
             APhm.put("AP3LON" , "");
             APhm.put("AP3LAT", "");
@@ -115,36 +116,65 @@ public class Wifi extends User {
         @Override
         protected void onPostExecute(String Resp) {
 
-            Log.i("BSSID", "This is the mac to be looked up" + APhm.get("AP1BSSID"));
-            RequestParams params = new RequestParams();
-            params.put("netid" , APhm.get("AP1BSSID"));
+            final int[] wifiProcessedCount = {1};
+            String CurrentAP = "";
+            final RequestParams params = new RequestParams();
 
-            if(Resp.equals("SUCCESS")){
+            if(wifiProcessedCount[0] == 1){
+            params.put("netid" , APhm.get("AP1BSSID"));}
+            else if(wifiProcessedCount[0] == 2){
+                params.put("netid", APhm.get("AP2BSSID"));
+            }
+            else if(wifiProcessedCount[0] == 3){
+                params.put("netid", "AP3BSSID");
+            }
+
+
+
+            if(Resp.equals("SUCCESS")) {
                 Log.i("GET", "Executing Get Req.");
                 client.setBasicAuth("AID5de8eada7ff8fd72337913007b346e1f", "b9da51d6f0621b4dd95fa517da6a932d", new AuthScope(AuthScope.ANY_REALM, AuthScope.ANY_PORT));
-                client.get(APurl, params, new JsonHttpResponseHandler(){
+                client.get(APurl, params, new JsonHttpResponseHandler() {
 
                     @Override
-                    public void onSuccess(int statusCode, Header[] headers, JSONObject response){
+                    public void onSuccess(int statusCode, Header[] headers, JSONObject response) {
                         Log.d("Track", "Great Success" + response.toString());
+
+
+                        try {
+                            if (response.get("success").toString() == "false") {
+
+                            }
+
+                        if(response.get("success").toString() == "true"){
+
+
+
+                            }
+                        } catch (JSONException e) {
+                            e.printStackTrace();
+                        }
+
+
+
 
 
                     }
 
                     @Override
-                    public void onFailure(int statusCode, Header[] headers, Throwable e, JSONObject response){
+                    public void onFailure(int statusCode, Header[] headers, Throwable e, JSONObject response) {
                         Log.d("Track", "Fail" + e.toString());
                     }
 
 
-
                 });
-
-
-
-
-
             }
+
+
+
+
+
+
 
 
 
