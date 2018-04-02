@@ -8,7 +8,10 @@ import android.support.v4.app.FragmentActivity;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.util.Log;
+import android.widget.ArrayAdapter;
 import android.widget.CompoundButton;
+import android.widget.ListAdapter;
+import android.widget.ListView;
 import android.widget.Switch;
 import android.widget.Toast;
 
@@ -21,6 +24,8 @@ import com.google.android.gms.maps.SupportMapFragment;
 import com.google.android.gms.maps.model.LatLng;
 import com.google.android.gms.maps.model.MarkerOptions;
 
+import java.util.HashMap;
+
 import static com.example.daniel.track.R.id.mapView;
 
 public class MapsActiv extends FragmentActivity implements OnMapReadyCallback{
@@ -28,7 +33,9 @@ public class MapsActiv extends FragmentActivity implements OnMapReadyCallback{
     GoogleMap mMap;
     Switch togTrk;
     ConnectivityManager conMgr;
+    ListView LocList;
     Wifi w = new Wifi();
+    ArrayAdapter<String> LisAdap;
 
 
     @Override
@@ -40,6 +47,7 @@ public class MapsActiv extends FragmentActivity implements OnMapReadyCallback{
         SupportMapFragment mapFragment = (SupportMapFragment) getSupportFragmentManager().findFragmentById(R.id.mapView);
         mapFragment.getMapAsync(this);
         togTrk = (Switch) findViewById(R.id.swTrk);
+        LocList = (ListView) findViewById(R.id.LocList);
         conMgr =  (ConnectivityManager) getSystemService(Context.CONNECTIVITY_SERVICE);
         togTrk.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
             @Override
@@ -64,7 +72,11 @@ public class MapsActiv extends FragmentActivity implements OnMapReadyCallback{
     public void onMapReady(GoogleMap googleMap) {
         LatLng Sunderland = new LatLng(54.90465, -1.38222);
         googleMap.addMarker(new MarkerOptions().position(Sunderland).title("Sun"));
-        googleMap.moveCamera(CameraUpdateFactory.newLatLng(Sunderland));
+        //googleMap.moveCamera(CameraUpdateFactory.newLatLng(Sunderland));
+        googleMap.moveCamera(CameraUpdateFactory.newLatLngZoom(Sunderland, 15));
+
+
+
 
 
     }
@@ -85,6 +97,8 @@ public class MapsActiv extends FragmentActivity implements OnMapReadyCallback{
         Context WCont = this;
         w.GetWireless1(WCont);
 
+
+
         }
         else{Toast.makeText(this , "Check Internet Connectivity!", Toast.LENGTH_LONG);}
 
@@ -92,6 +106,12 @@ public class MapsActiv extends FragmentActivity implements OnMapReadyCallback{
 
 
 
+
+
+    }
+
+    public void UpdateLocList(HashMap APhm){
+        HashMap APHM = w.getAPhm();
 
 
     }
