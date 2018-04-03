@@ -22,13 +22,14 @@ public class MainActivity extends AppCompatActivity {
     Boolean Logged = false;
     login l = new User();
     Boolean Authed = false;
+    Boolean Authentication =  false;
+    User UserObj = new User();
 
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
-        User UserObj = new User();
         Intent intent = getIntent();
         btnLogin = (Button) findViewById(R.id.btnLoginL);
         btnRegister = (Button) findViewById(R.id.btnRegisterL);
@@ -39,7 +40,7 @@ public class MainActivity extends AppCompatActivity {
             @Override
             public void onClick(View view) {
                 Log.i("OnClick", "Login on click executing.");
-                Logged = Login();
+                Login();
                 if (Logged == true){Toast.makeText(getApplicationContext(), "User Authenticated",Toast.LENGTH_LONG).show();
                     switchMap(view);
                 }
@@ -62,7 +63,7 @@ public class MainActivity extends AppCompatActivity {
         startActivity(mapInt);
 
     }
-    public Boolean Login(){
+    public void Login(){
 
 
         String Usr = txtUser.getText().toString();
@@ -85,20 +86,39 @@ public class MainActivity extends AppCompatActivity {
         }
 
 
+        MainLoginBack M = new MainLoginBack();
 
 
 
+        M.execute(Usr, Pass);
 
-        Log.i("Value of Auth aflogin" , "Auth is " + Authed);
-        Log.i("Value of Auth aflogin" , "Auth is " + Authed);
-        return Authed;
+    }
+    public void CheckLoginResult(Boolean Authentication){
+        Log.i("CheckLoginResult", "EXECUTING" + Authed.toString());
+        //Authentication = UserObj.getAuthenticated();
+
+        Log.i("AUTH FINAL", "Val of Authentic" + Authentication);
+
+
     }
     private class MainLoginBack extends AsyncTask<String, String, String> {
-        @Override
-        protected String doInBackground(String... jsonObjects) {
-            Authed = l.LoginUser(Usr, Pass);
 
-            return null;
+
+
+        @Override
+        protected String doInBackground(String... Login) {
+
+            Log.d("This is a back", "Vals are" + Login[0] + " " + Login[1] );
+            Authentication = UserObj.LoginUser(Login[0], Login[1]);
+            Log.d("AUTH", "VAL BACK" + Authentication);
+
+            return "";
+        }
+        protected void onPostExecute(String Result){
+
+            Log.d("AUTHmain", "Back Val " + Authentication);
+
+            CheckLoginResult(Authentication);
         }
     }
 

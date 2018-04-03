@@ -12,11 +12,9 @@ import java.io.DataOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
-import java.io.UnsupportedEncodingException;
 import java.net.URL;
 import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
-import java.util.Arrays;
 import java.util.Objects;
 
 import javax.net.ssl.HostnameVerifier;
@@ -35,6 +33,9 @@ public class User implements reg_user , login{
     String email;
     String pass;
     Boolean AUTH = false;
+    Boolean Authenticated = false;
+
+
 
     private int getUserID() {
         return UserID;
@@ -69,7 +70,7 @@ public class User implements reg_user , login{
     }
     public Boolean LoginUser(String username, String Pass){
         AUTH = false;
-        Boolean Authenticated = false;
+
         String hashPass2 = null;
               hashPass2  = HashPass(Pass);
         JSONObject LoginReq = new JSONObject();
@@ -82,9 +83,13 @@ public class User implements reg_user , login{
             e.printStackTrace();
         }
         new BackgroundLogin().execute(LoginReq);
-        if (AUTH == true){Authenticated = true;}
+        if (AUTH){Authenticated = true;}
         if (AUTH == false){Authenticated = false;}
+
+        Log.i("LoginUser", "This is val of Authenticated and AUTH" + Authenticated + " " + AUTH);
+
         return Authenticated;
+
     }
 
     public boolean RegUsr(String User, String Name, String email, String pass){
@@ -103,10 +108,8 @@ public class User implements reg_user , login{
         if(Done){System.out.println("Completed User Registration");}
         return  Done;
     }
-    private boolean Authenticate(){
-        boolean authorised;
-        return authorised = true;
-    }
+
+
     private void AddUsertoDB(User us){
 
         JSONObject UsrJS = new JSONObject();
@@ -198,17 +201,25 @@ public class User implements reg_user , login{
 
         @Override
         protected Void doInBackground(JSONObject... params) {
-            System.out.println("Executing Background Login");
+            System.out.println("1 Executing Background Login");
 
             LoginOk = SendLoginReq(params[0]);
+
+
             return null;
         }
 
         @Override
         protected void onPostExecute(Void aVoid) {
             super.onPostExecute(aVoid);
-            if (LoginOk == true){AUTH = true;}
+
+            Log.i("AUTH", "Postex of Backlog " + LoginOk);
+
+            if (LoginOk == true){Authenticated = true; }
+
         }
+
+
     }
     private Boolean SendLoginReq(JSONObject logreq){
 
@@ -275,6 +286,7 @@ public class User implements reg_user , login{
         Log.d("req user val" , "this is val req usrr" + reqUser);
         LoginOK = CheckReturn(dbUser , dbPass , reqUser, reqPass);
 
+        Log.i("AUTH", "Val of Login ok " + LoginOK);
 
         return LoginOK;
 
@@ -302,6 +314,7 @@ public class User implements reg_user , login{
         if(Objects.equals(dbUser, reqUser)) {
             System.out.println("Username matches");
             match = true;
+            Log.i("match Val" , " " + match);
         }
 
         passMatch1 = dbPass.compareTo(reqPass);
@@ -314,7 +327,7 @@ public class User implements reg_user , login{
 
                 System.out.println("Pass Hashes match");
                 match2 = true;
-
+                Log.i("match2 Val" , " " + match2);
             }
 
 
@@ -322,7 +335,7 @@ public class User implements reg_user , login{
         Log.d("Match val " , "This is" + match);
 
 
-        if(match && match2){ both = true; }
+        if(match && match2 == true){ both = true; }
         else{both = false;}
 
      return both;
