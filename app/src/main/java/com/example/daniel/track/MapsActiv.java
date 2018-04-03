@@ -4,6 +4,9 @@ import android.content.Context;
 import android.content.Intent;
 import android.net.ConnectivityManager;
 import android.net.NetworkInfo;
+import android.os.Handler;
+import android.os.Looper;
+import android.os.Message;
 import android.support.v4.app.FragmentActivity;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
@@ -35,7 +38,9 @@ public class MapsActiv extends FragmentActivity implements OnMapReadyCallback{
     ConnectivityManager conMgr;
     ListView LocList;
     Wifi w = new Wifi();
-    ArrayAdapter<String> LisAdap;
+    HashMap APS = new HashMap();
+    ArrayAdapter<String> ListAdap;
+    Handler mHandle;
 
 
     @Override
@@ -49,18 +54,26 @@ public class MapsActiv extends FragmentActivity implements OnMapReadyCallback{
         togTrk = (Switch) findViewById(R.id.swTrk);
         LocList = (ListView) findViewById(R.id.LocList);
         conMgr =  (ConnectivityManager) getSystemService(Context.CONNECTIVITY_SERVICE);
+        LocList.setAdapter(ListAdap);
+
+        mHandle = new Handler(Looper.getMainLooper()) {
+
+            @Override
+            public void handleMessage(Message inputMessage) {
+
+                HashMap APS = (HashMap) inputMessage.obj;
+                UpdateLocList(APS);
+
+            }
+        };
+
+
+
         togTrk.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
             @Override
             public void onCheckedChanged(CompoundButton compoundButton, boolean isChecked) {
 
-                if(isChecked){
-
-
-                    toggleTracking();
-
-                }
-
-
+                if(isChecked){ toggleTracking(); }
             }
         });
 
@@ -96,23 +109,21 @@ public class MapsActiv extends FragmentActivity implements OnMapReadyCallback{
         Toast.makeText(this, "Connected!", Toast.LENGTH_LONG);
         Context WCont = this;
         w.GetWireless1(WCont);
+        APS = w.getAPhm();
+            UpdateLocList(APS);
 
 
 
         }
         else{Toast.makeText(this , "Check Internet Connectivity!", Toast.LENGTH_LONG);}
 
+    }
 
+    public void UpdateLocList(HashMap APS){
 
-
-
-
+        Log.i("APS", "THIS IS" + APS.toString());
 
     }
 
-    public void UpdateLocList(HashMap APhm){
-        HashMap APHM = w.getAPhm();
 
-
-    }
 }

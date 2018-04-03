@@ -1,9 +1,11 @@
 package com.example.daniel.track;
 
+import android.app.Activity;
 import android.content.Context;
 import android.net.wifi.ScanResult;
 import android.net.wifi.WifiManager;
 import android.os.AsyncTask;
+import android.os.Process;
 import android.util.Log;
 
 import com.loopj.android.http.AsyncHttpClient;
@@ -38,6 +40,10 @@ public class Wifi extends User {
     public HashMap APhm = new HashMap();
 
     public HashMap getAPhm() {
+
+
+
+
         return APhm;
     }
 
@@ -131,23 +137,34 @@ public class Wifi extends User {
 
 
             }
-            GetLonLat(APhm);
+            GetLonLat g = new GetLonLat();
+            g.run();
 
         }
 
 
-        public void GetLonLat(HashMap APhm) {
+        public class GetLonLat implements Runnable {
             int APcount = 1 ;
-            Log.i("GetLonLat", "EXECUTED");
 
-            while(APcount <= 3){
+            public void run(){Log.i("GetLonLat", "EXECUTED");
 
-                if(APcount == 1){GetWigle(APcount, APhm);}
-                else if(APcount == 2){GetWigle(APcount, APhm);}
-                else if(APcount == 3){GetWigle(APcount, APhm);}
+             android.os.Process.setThreadPriority(Process.THREAD_PRIORITY_MORE_FAVORABLE);
 
-                APcount+=1;
+                while(APcount <= 3){
+
+                    if(APcount == 1){GetWigle(APcount, APhm);}
+                    else if(APcount == 2){GetWigle(APcount, APhm);}
+                    else if(APcount == 3){GetWigle(APcount, APhm);}
+
+                    APcount+=1;
+                }
             }
+
+
+
+
+
+
 
         }
 
@@ -229,11 +246,16 @@ public class Wifi extends User {
                             }
 
 
+                            if(APcount == 3){        }
+
+
 
                         }
                     } catch (JSONException e) {
                         e.printStackTrace();
                     }
+
+
                 }
                 @Override
                 public void onFailure(int statusCode, Header[] headers, Throwable e, JSONObject response) {
@@ -251,12 +273,10 @@ public class Wifi extends User {
     }
 
 
+    }
 
 
 
-
-
-}
 
 
 

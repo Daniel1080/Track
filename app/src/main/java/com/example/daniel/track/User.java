@@ -35,7 +35,13 @@ public class User implements reg_user , login{
     Boolean AUTH = false;
     Boolean Authenticated = false;
 
+    public Boolean getAuthenticated() {
+        return Authenticated;
+    }
 
+    public Boolean getAUTH() {
+        return AUTH;
+    }
 
     private int getUserID() {
         return UserID;
@@ -70,6 +76,7 @@ public class User implements reg_user , login{
     }
     public Boolean LoginUser(String username, String Pass){
         AUTH = false;
+        BackgroundLogin BL = new BackgroundLogin();
 
         String hashPass2 = null;
               hashPass2  = HashPass(Pass);
@@ -82,7 +89,8 @@ public class User implements reg_user , login{
         } catch (JSONException e) {
             e.printStackTrace();
         }
-        new BackgroundLogin().execute(LoginReq);
+        BL.execute(LoginReq);
+
         if (AUTH){Authenticated = true;}
         if (AUTH == false){Authenticated = false;}
 
@@ -213,9 +221,8 @@ public class User implements reg_user , login{
         protected void onPostExecute(Void aVoid) {
             super.onPostExecute(aVoid);
 
-            Log.i("AUTH", "Postex of Backlog " + LoginOk);
-
             if (LoginOk == true){Authenticated = true; }
+            Log.i("AUTH", "Postex of Backlog " + LoginOk + " Postex of Authen " + Authenticated);
 
         }
 

@@ -42,9 +42,11 @@ public class MainActivity extends AppCompatActivity {
                 Log.i("OnClick", "Login on click executing.");
                 Login();
                 if (Logged == true){Toast.makeText(getApplicationContext(), "User Authenticated",Toast.LENGTH_LONG).show();
-                    switchMap(view);
+
                 }
                 else if(Logged == false){Toast.makeText(getApplicationContext(), "Authentication failed!", Toast.LENGTH_LONG).show();}
+
+                switchMap(view);
 
             }
         });
@@ -58,6 +60,7 @@ public class MainActivity extends AppCompatActivity {
     public  void switchMap(View view){
 
         Intent mapInt = new Intent(this, MapsActiv.class);
+
         Vibrator v2 = (Vibrator) getSystemService(Context.VIBRATOR_SERVICE);
         v2.vibrate(500);
         startActivity(mapInt);
@@ -95,7 +98,7 @@ public class MainActivity extends AppCompatActivity {
     }
     public void CheckLoginResult(Boolean Authentication){
         Log.i("CheckLoginResult", "EXECUTING" + Authed.toString());
-        //Authentication = UserObj.getAuthenticated();
+        Authentication = UserObj.getAuthenticated();
 
         Log.i("AUTH FINAL", "Val of Authentic" + Authentication);
 
