@@ -33,7 +33,7 @@ public class User implements reg_user , login{
     String user;
     String name;
     String email;
-    byte [] pass;
+    String pass;
     Boolean AUTH = false;
 
     private int getUserID() {
@@ -51,13 +51,13 @@ public class User implements reg_user , login{
     private String getEmail() {
         return email;
     }
-    private byte [] getPass() {
+    private String getPass() {
         return pass;
     }
 
     public User(){}
 
-     public User(String user, String Name, String email, byte [] pass) {
+     public User(String user, String Name, String email, String pass) {
         UserID = UserCount +1;
         this.user = user;
         this.name = Name;
@@ -70,7 +70,7 @@ public class User implements reg_user , login{
     public Boolean LoginUser(String username, String Pass){
         AUTH = false;
         Boolean Authenticated = false;
-        byte [] hashPass2 = null;
+        String hashPass2 = null;
               hashPass2  = HashPass(Pass);
         JSONObject LoginReq = new JSONObject();
 
@@ -91,7 +91,7 @@ public class User implements reg_user , login{
 
         Boolean Done = false;
         String befHash = pass;
-        byte [] afHash = null;
+        String afHash = null;
         pass = null;
         afHash = HashPass(befHash);
         User us1 = new User(User,Name, email, afHash);
@@ -157,23 +157,27 @@ public class User implements reg_user , login{
             e.printStackTrace();
         }
     }
-    private byte [] HashPass(String befHash){
+    private String HashPass(String befHash){
         System.out.println("HashPass Called");
-        MessageDigest md = null;
-        byte [] passBytes = null;
+        try {
+            MessageDigest digest = MessageDigest.getInstance("MD5");
+            digest.update(befHash.getBytes());
+            byte messageDigest[] = digest.digest();
 
-        try{
-        md = MessageDigest.getInstance("MD5");
+            StringBuffer hexString = new StringBuffer();
+            for(int i=0; i < messageDigest.length; i++)
+                hexString.append(Integer.toHexString(0xFF & messageDigest[i]));
+            return hexString.toString();
 
-                md.update(befHash.getBytes());
 
-            passBytes = md.digest();
-        }
-        catch (NoSuchAlgorithmException e){
+        } catch (NoSuchAlgorithmException e) {
             e.printStackTrace();
         }
-        System.out.println(passBytes);
-        return passBytes;
+
+
+
+
+       return "";
 
     }
 
@@ -278,34 +282,50 @@ public class User implements reg_user , login{
 
     public boolean CheckReturn(String dbUser, String dbPass, String reqUser, String reqPass){
         boolean match = false;
+        boolean match2 = false;
+        boolean both = false;
+        int passMatch1 = 0;
+        int passMatch2 = 0;
+        int passRes = 1;
+
 
         Log.d("req user val" , "this is val req usrr" + reqUser);
-        byte [] hashReqPass = new byte[0];
-        byte [] hashDbPass = new byte[0];
 
-            hashReqPass = reqPass.getBytes();
-            hashDbPass = dbPass.getBytes();
 
         System.out.println("dbuser is " + dbUser + " requser is " + reqUser);
 
 
 
 
-        System.out.println(hashDbPass + " " + hashReqPass);
+        System.out.println(reqPass + " " + dbPass);
 
-        if(Objects.equals(dbUser, reqUser)){
+        if(Objects.equals(dbUser, reqUser)) {
             System.out.println("Username matches");
-                match = true;
-            if (Arrays.equals(hashDbPass, hashReqPass)){
+            match = true;
+        }
+
+        passMatch1 = dbPass.compareTo(reqPass);
+        passMatch2 = reqPass.compareTo(dbPass);
+        Log.d("PASScheck", "These are the vals" + passMatch1 + " " + passMatch2);
+        passRes = passMatch1 + passMatch2;
+        Log.d("PASScheck", "Result is " + passRes);
+
+            if (passRes == 0){
 
                 System.out.println("Pass Hashes match");
+                match2 = true;
 
             }
 
 
-        }
+
         Log.d("Match val " , "This is" + match);
-     return match;
+
+
+        if(match && match2){ both = true; }
+        else{both = false;}
+
+     return both;
     }
 
  }

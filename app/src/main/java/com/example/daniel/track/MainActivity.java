@@ -2,14 +2,13 @@ package com.example.daniel.track;
 
 import android.content.Context;
 import android.content.Intent;
-import android.os.VibrationEffect;
+import android.os.AsyncTask;
 import android.os.Vibrator;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.View;
 import android.widget.Button;
-import android.widget.EditText;
 import android.widget.TextView;
 import android.widget.Toast;
 
@@ -22,6 +21,7 @@ public class MainActivity extends AppCompatActivity {
     TextView txtPass;
     Boolean Logged = false;
     login l = new User();
+    Boolean Authed = false;
 
 
     @Override
@@ -39,9 +39,12 @@ public class MainActivity extends AppCompatActivity {
             @Override
             public void onClick(View view) {
                 Log.i("OnClick", "Login on click executing.");
-               // Logged = Login();
-                if (Logged == true){Toast.makeText(getApplicationContext(), "User Authenticated",Toast.LENGTH_LONG).show();}
-                switchMap(view);
+                Logged = Login();
+                if (Logged == true){Toast.makeText(getApplicationContext(), "User Authenticated",Toast.LENGTH_LONG).show();
+                    switchMap(view);
+                }
+                else if(Logged == false){Toast.makeText(getApplicationContext(), "Authentication failed!", Toast.LENGTH_LONG).show();}
+
             }
         });
     }
@@ -60,7 +63,7 @@ public class MainActivity extends AppCompatActivity {
 
     }
     public Boolean Login(){
-        Boolean Authed = false;
+
 
         String Usr = txtUser.getText().toString();
         String Pass = txtPass.getText().toString();
@@ -82,10 +85,21 @@ public class MainActivity extends AppCompatActivity {
         }
 
 
-        Authed = l.LoginUser(Usr, Pass);
+
+
+
+
         Log.i("Value of Auth aflogin" , "Auth is " + Authed);
         Log.i("Value of Auth aflogin" , "Auth is " + Authed);
         return Authed;
+    }
+    private class MainLoginBack extends AsyncTask<String, String, String> {
+        @Override
+        protected String doInBackground(String... jsonObjects) {
+            Authed = l.LoginUser(Usr, Pass);
+
+            return null;
+        }
     }
 
 
