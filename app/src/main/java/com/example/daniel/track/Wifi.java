@@ -39,12 +39,9 @@ public class Wifi extends User {
     AsyncHttpClient client = new AsyncHttpClient();
     public HashMap APhm = new HashMap();
 
+
     public HashMap getAPhm() {
-
-
-
-
-        return APhm;
+        return this.APhm;
     }
 
     public void GetWireless1(Context cont) {
@@ -88,27 +85,33 @@ public class Wifi extends User {
                 Log.d("WIFI", "No Wireless networks found!");
             }
 
+
+
             APhm.put("AP1", wifiLis.get(0).SSID);
             APhm.put("AP1TIME", time);
             APhm.put("AP1BSSID", wifiLis.get(0).BSSID.toString());
             APhm.put("AP1LEVEL", wifiLis.get(0).level);
+            APhm.put("AP1FREQ", wifiLis.get(0).frequency);
             APhm.put("AP1LON", "");
             APhm.put("AP1LAT", "");
             APhm.put("AP2", wifiLis.get(1).SSID);
             APhm.put("AP2TIME", time);
             APhm.put("AP2BSSID", wifiLis.get(1).BSSID.toString());
             APhm.put("AP2LEVEL", wifiLis.get(1).level);
+            APhm.put("AP2FREQ", wifiLis.get(1).frequency);
             APhm.put("AP2LON", "");
             APhm.put("AP2LAT", "");
             APhm.put("AP3", wifiLis.get(2).SSID);
             APhm.put("AP3TIME", time);
             APhm.put("AP3BSSID", wifiLis.get(2).BSSID.toString());
             APhm.put("AP3LEVEL", wifiLis.get(2).level);
+            APhm.put("AP3FREQ", wifiLis.get(2).frequency);
             APhm.put("AP3LON", "");
             APhm.put("AP3LAT", "");
 
             System.out.println("This is the first network :::: " + wifiLis.get(0).SSID.toString());
             System.out.println(APhm.get("AP1BSSID") + " " + APhm.get("AP2BSSID") + " " + APhm.get("AP3BSSID"));
+            System.out.println(APhm.get("AP1") + " " + APhm.get("AP2") + " " + APhm.get("AP3"));
 
             if (APhm.isEmpty()) {
                 Resp = "FAIL";
@@ -124,6 +127,8 @@ public class Wifi extends User {
 
         @Override
         protected void onPostExecute(String Resp) {
+
+            Log.d("POST ", APhm.toString() );
 
             if (Resp == "SUCCESS") {
                 Log.i("WIFI", "Lookup Success!");
@@ -158,6 +163,8 @@ public class Wifi extends User {
 
                     APcount+=1;
                 }
+
+                Log.d("APHM", " " + APhm.toString());
             }
 
 
@@ -228,6 +235,7 @@ public class Wifi extends User {
                                     APhm.put("AP1LON", jsAP1.getJSONObject(0).getString("trilong"));
                                     APhm.put("AP1LAT", jsAP1.getJSONObject(0).getString("trilat"));
 
+                                    Log.d("CASE3 AP3 ",  APhm.get("AP1LON").toString());
                                     break;
                                 case 2:
                                     Log.d( "CURRENT :::", response.getJSONArray("results").toString());
@@ -235,6 +243,8 @@ public class Wifi extends User {
 
                                     APhm.put("AP2LON", jsAP2.getJSONObject(0).getString("trilong"));
                                     APhm.put("AP2LAT", jsAP2.getJSONObject(0).getString("trilat"));
+
+                                    Log.d("CASE2 AP2 ",  APhm.toString());
                                     break;
                                 case 3:
                                     Log.d( "CURRENT :::", response.getJSONArray("results").toString());
@@ -242,6 +252,8 @@ public class Wifi extends User {
 
                                     APhm.put("AP3LON", jsAP3.getJSONObject(0).getString("trilong"));
                                     APhm.put("AP3LAT", jsAP3.getJSONObject(0).getString("trilat"));
+
+                                    Log.d("CASE3 AP3 ",  APhm.toString());
                                     break;
                             }
 
