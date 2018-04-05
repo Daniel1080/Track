@@ -20,6 +20,12 @@
             android:layout_height="wrap_content"
             android:orientation="vertical">
 
+            <Space
+                android:id="@+id/topSpace"
+                android:layout_width="match_parent"
+                android:layout_height="24dp"
+                android:background="@color/colorPrimary" />
+
             <EditText
                 android:id="@+id/txtUserL"
                 android:layout_width="match_parent"

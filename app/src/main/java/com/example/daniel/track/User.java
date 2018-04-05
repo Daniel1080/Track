@@ -1,14 +1,45 @@
 package com.example.daniel.track;
 
+import android.app.Activity;
+import android.content.BroadcastReceiver;
+import android.content.ComponentName;
+import android.content.ContentResolver;
+import android.content.Context;
+import android.content.Intent;
+import android.content.IntentFilter;
+import android.content.IntentSender;
+import android.content.ServiceConnection;
+import android.content.SharedPreferences;
+import android.content.pm.ApplicationInfo;
+import android.content.pm.PackageManager;
+import android.content.res.AssetManager;
+import android.content.res.Configuration;
+import android.content.res.Resources;
+import android.database.DatabaseErrorHandler;
+import android.database.sqlite.SQLiteDatabase;
+import android.graphics.Bitmap;
+import android.graphics.drawable.Drawable;
 import android.net.SSLCertificateSocketFactory;
+import android.net.Uri;
 import android.os.AsyncTask;
+import android.os.Bundle;
+import android.os.Handler;
+import android.os.Looper;
+import android.os.UserHandle;
+import android.support.annotation.NonNull;
+import android.support.annotation.Nullable;
 import android.util.Log;
+import android.view.Display;
 
 import org.json.JSONException;
 import org.json.JSONObject;
 
 import java.io.BufferedReader;
 import java.io.DataOutputStream;
+import java.io.File;
+import java.io.FileInputStream;
+import java.io.FileNotFoundException;
+import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
@@ -19,6 +50,8 @@ import java.util.Objects;
 
 import javax.net.ssl.HostnameVerifier;
 import javax.net.ssl.HttpsURLConnection;
+
+import cz.msebera.android.httpclient.auth.AUTH;
 
 /**
  * Created by Daniel on 13/02/2018.
@@ -34,8 +67,12 @@ public class User implements reg_user , login{
     String pass;
     Boolean AUTH = false;
     Boolean Authenticated = false;
+    Context context;
 
-    public Boolean getAuthenticated() {
+    
+
+
+    Boolean getAuthenticated() {
         return Authenticated;
     }
 
@@ -62,7 +99,12 @@ public class User implements reg_user , login{
         return pass;
     }
 
+    public User(Context cont){
+        this.context = cont;
+    }
     public User(){}
+
+
 
      public User(String user, String Name, String email, String pass) {
         UserID = UserCount +1;
@@ -71,10 +113,11 @@ public class User implements reg_user , login{
         this.email = email;
         this.pass = pass;
     }
+
     public void CallReg(String User, String Name, String email, String pass){
         new BackgroundReg().execute(User, Name, email, pass);
     }
-    public Boolean LoginUser(String username, String Pass){
+    public void LoginUser(String username, String Pass){
         AUTH = false;
         BackgroundLogin BL = new BackgroundLogin();
 
@@ -91,13 +134,7 @@ public class User implements reg_user , login{
         }
         BL.execute(LoginReq);
 
-        if (AUTH){Authenticated = true;}
-        if (AUTH == false){Authenticated = false;}
-
-        Log.i("LoginUser", "This is val of Authenticated and AUTH" + Authenticated + " " + AUTH);
-
-        return Authenticated;
-
+        Log.i("LoginUser", "This is val of Authenticated and AUTH " + Authenticated + " " + AUTH);
     }
 
     public boolean RegUsr(String User, String Name, String email, String pass){
@@ -185,49 +222,10 @@ public class User implements reg_user , login{
             e.printStackTrace();
         }
 
-
-
-
        return "";
 
     }
 
-    private class BackgroundReg extends AsyncTask<String, Void, Void> {
-        @Override
-        protected Void doInBackground(String... params) {
-            System.out.println("Back Task");
-            System.out.println("Params " + params[0]);
-
-
-            RegUsr(params[0], params[1], params[2], params[3]);
-            return null;
-        }
-    }
-    private class BackgroundLogin extends AsyncTask<JSONObject, Void, Void> {
-
-        public Boolean LoginOk = false;
-
-        @Override
-        protected Void doInBackground(JSONObject... params) {
-            System.out.println("1 Executing Background Login");
-
-            LoginOk = SendLoginReq(params[0]);
-
-
-            return null;
-        }
-
-        @Override
-        protected void onPostExecute(Void aVoid) {
-            super.onPostExecute(aVoid);
-
-            if (LoginOk == true){Authenticated = true; }
-            Log.i("AUTH", "Postex of Backlog " + LoginOk + " Postex of Authen " + Authenticated);
-
-        }
-
-
-    }
     private Boolean SendLoginReq(JSONObject logreq){
 
         Boolean LoginOK = false;
@@ -238,10 +236,7 @@ public class User implements reg_user , login{
         String reqUser = "";
 
         try {
-
-
-             reqUser = logreq.getString("user");
-
+            reqUser = logreq.getString("user");
             reqPass = logreq.getString("pass");
             Log.d("req user val" , "this is val req usrr" + reqUser);
         } catch (JSONException e) {
@@ -281,10 +276,7 @@ public class User implements reg_user , login{
                 } catch (JSONException e) {
                     e.printStackTrace();
                 }
-
             }
-
-
         }
         catch (IOException e) {
             e.printStackTrace();
@@ -296,7 +288,6 @@ public class User implements reg_user , login{
         Log.i("AUTH", "Val of Login ok " + LoginOK);
 
         return LoginOK;
-
     }
 
     public boolean CheckReturn(String dbUser, String dbPass, String reqUser, String reqPass){
@@ -307,15 +298,8 @@ public class User implements reg_user , login{
         int passMatch2 = 0;
         int passRes = 1;
 
-
         Log.d("req user val" , "this is val req usrr" + reqUser);
-
-
         System.out.println("dbuser is " + dbUser + " requser is " + reqUser);
-
-
-
-
         System.out.println(reqPass + " " + dbPass);
 
         if(Objects.equals(dbUser, reqUser)) {
@@ -323,29 +307,65 @@ public class User implements reg_user , login{
             match = true;
             Log.i("match Val" , " " + match);
         }
+        else{
+            Log.i("Username" , "Username does not match " + match);
+            match = false;}
 
         passMatch1 = dbPass.compareTo(reqPass);
         passMatch2 = reqPass.compareTo(dbPass);
-        Log.d("PASScheck", "These are the vals" + passMatch1 + " " + passMatch2);
+        Log.d("PASScheck", "These are the vals " + passMatch1 + " " + passMatch2);
         passRes = passMatch1 + passMatch2;
         Log.d("PASScheck", "Result is " + passRes);
 
-            if (passRes == 0){
+        if (passRes == 0){
 
-                System.out.println("Pass Hashes match");
-                match2 = true;
-                Log.i("match2 Val" , " " + match2);
-            }
-
-
+            System.out.println("Pass Hashes match");
+            match2 = true;
+            Log.i("match2 Val" , " " + match2);
+        }
 
         Log.d("Match val " , "This is" + match);
 
-
-        if(match && match2 == true){ both = true; }
+        if(match == true && match2 ==true){ both = true;}
         else{both = false;}
+        Log.i("BOTH " , "Val of both " + both);
+        return both;
+    }
 
-     return both;
+
+
+    private class BackgroundReg extends AsyncTask<String, Void, Void> {
+        @Override
+        protected Void doInBackground(String... params) {
+            System.out.println("Back Task");
+            System.out.println("Params " + params[0]);
+            RegUsr(params[0], params[1], params[2], params[3]);
+            return null;
+        }
+    }
+
+
+    private class BackgroundLogin extends AsyncTask<JSONObject, Void, Void> {
+
+        public Boolean LoginOk = false;
+
+        @Override
+        protected Void doInBackground(JSONObject... params) {
+            System.out.println("1 Executing Background Login");
+            LoginOk = SendLoginReq(params[0]);
+            if (LoginOk == true){AUTH = true; }
+            Log.i("AUTH", "Postex of Backlog " + LoginOk + " Val of AUTH " + AUTH);
+            return null;
+        }
+        @Override
+        protected void onPostExecute(Void aVoid) {
+
+
+            ((MainActivity)context).CheckLoginResult();
+
+        }
+
+
     }
 
  }

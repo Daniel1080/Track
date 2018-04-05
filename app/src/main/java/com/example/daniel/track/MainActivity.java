@@ -20,11 +20,9 @@ public class MainActivity extends AppCompatActivity {
     TextView txtUser;
     TextView txtPass;
     Boolean Logged = false;
-    login l = new User();
     Boolean Authed = false;
     Boolean Authentication =  false;
-    User UserObj = new User();
-
+    User UserObj;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -35,18 +33,15 @@ public class MainActivity extends AppCompatActivity {
         btnRegister = (Button) findViewById(R.id.btnRegisterL);
         txtPass = (TextView) findViewById(R.id.txtPassL);
         txtUser = (TextView) findViewById(R.id.txtUserL);
+        UserObj = new User(this);
+
+
 
         btnLogin.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
                 Log.i("OnClick", "Login on click executing.");
                 Login();
-                if (Logged == true){Toast.makeText(getApplicationContext(), "User Authenticated",Toast.LENGTH_LONG).show();
-
-                }
-                else if(Logged == false){Toast.makeText(getApplicationContext(), "Authentication failed!", Toast.LENGTH_LONG).show();}
-
-                switchMap(view);
 
             }
         });
@@ -57,7 +52,7 @@ public class MainActivity extends AppCompatActivity {
         v.vibrate(450);
         startActivity(intent);
     }
-    public  void switchMap(View view){
+    public  void switchMap(int view){
 
         Intent mapInt = new Intent(this, MapsActiv.class);
 
@@ -68,6 +63,8 @@ public class MainActivity extends AppCompatActivity {
     }
     public void Login(){
 
+        Boolean usOK = false;
+        Boolean passOK = false;
 
         String Usr = txtUser.getText().toString();
         String Pass = txtPass.getText().toString();
@@ -79,51 +76,58 @@ public class MainActivity extends AppCompatActivity {
         System.out.println(Usr);
 
         if (Usr.trim().length() < 1){
-            Authed = false;
+            usOK = false;
             Toast.makeText(getApplicationContext(), "Please enter a username!",Toast.LENGTH_LONG).show();
             txtPass.setText("");
+            return;
         }
+        else {usOK = true;}
         if(Pass.trim().length() < 1){
-            Authed = false;
+            passOK = false;
             Toast.makeText(getApplicationContext(), "Please enter a password!", Toast.LENGTH_LONG).show();
+            return;
+        }else{passOK = true;}
+
+        if(usOK & passOK == true ){
+
+        Log.d("This is a back", "Vals are" + Usr + " " + Pass );
+          UserObj.LoginUser(Usr, Pass);
+           Log.d("AUTH", "VAL BACK" + Authentication);
+        }
+           //CheckLoginResult();
+    }
+    public void CheckLoginResult(){
+
+        Authentication = UserObj.getAUTH();
+
+        Log.i("AUTH FINAL", "Val of Authentic "  + Authentication);
+
+        if(Authentication == true){
+
+            switchMap(R.layout.activity_maps);
         }
 
 
-        MainLoginBack M = new MainLoginBack();
-
-
-
-        M.execute(Usr, Pass);
-
     }
-    public void CheckLoginResult(Boolean Authentication){
-        Log.i("CheckLoginResult", "EXECUTING" + Authed.toString());
-        Authentication = UserObj.getAuthenticated();
-
-        Log.i("AUTH FINAL", "Val of Authentic" + Authentication);
-
-
-    }
-    private class MainLoginBack extends AsyncTask<String, String, String> {
-
-
-
-        @Override
-        protected String doInBackground(String... Login) {
-
-            Log.d("This is a back", "Vals are" + Login[0] + " " + Login[1] );
-            Authentication = UserObj.LoginUser(Login[0], Login[1]);
-            Log.d("AUTH", "VAL BACK" + Authentication);
-
-            return "";
-        }
-        protected void onPostExecute(String Result){
-
-            Log.d("AUTHmain", "Back Val " + Authentication);
-
-            CheckLoginResult(Authentication);
-        }
-    }
+//    private class MainLoginBack extends AsyncTask<String, String, String> {
+//
+//        @Override
+//        protected String doInBackground(String... Login) {
+//
+//            Log.d("This is a back", "Vals are" + Login[0] + " " + Login[1] );
+//            UserObj.LoginUser(Login[0], Login[1]);
+//            Log.d("AUTH", "VAL BACK" + Authentication);
+//            CheckLoginResult(Authentication);
+//
+//            return "";
+//        }
+//        @Override
+//        protected void onPostExecute(String Result){
+//
+//            Log.d("AUTHmain", "Back Val " + Authentication);
+//
+//        }
+  }
 
 
 
@@ -132,7 +136,7 @@ public class MainActivity extends AppCompatActivity {
 
 
 
-}
+
 
 
 

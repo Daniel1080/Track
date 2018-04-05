@@ -26,21 +26,30 @@
             android:id="@+id/swTrk"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
+            android:layout_marginLeft="10dp"
             android:layout_marginRight="10dp"
             android:fontFamily="@font/josefin_sans_bold"
             android:paddingBottom="10dp"
             android:paddingLeft="10dp"
+            android:paddingRight="10dp"
             android:paddingTop="10dp"
             android:text="@string/swTitle"
-            android:theme="@style/SwitchTheme"
             android:textColor="@color/colorPrimaryDark"
             android:textColorLink="@android:color/holo_green_light"
-            android:textSize="24sp" />
+            android:textSize="24sp"
+            android:theme="@style/SwitchTheme" />
 
         <ListView
             android:id="@+id/LocList"
             android:layout_width="match_parent"
-            android:layout_height="match_parent" />
+            android:layout_height="match_parent"
+            android:background="@color/colorCloud"
+            android:fadeScrollbars="false"
+            android:fastScrollAlwaysVisible="false"
+            android:scrollIndicators="left"
+            android:scrollbarStyle="insideOverlay"
+            android:textColor="@color/colorExodus"
+            />
 
     </LinearLayout>
 </android.support.constraint.ConstraintLayout>

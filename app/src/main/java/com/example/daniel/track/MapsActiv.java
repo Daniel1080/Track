@@ -61,7 +61,7 @@ public class MapsActiv extends FragmentActivity implements OnMapReadyCallback {
         LocList = (ListView) findViewById(R.id.LocList);
         conMgr = (ConnectivityManager) getSystemService(Context.CONNECTIVITY_SERVICE);
         AP_List = new ArrayList<String>(Arrays.asList(""));
-        ListAdap = new ArrayAdapter<String>(this, android.R.layout.simple_list_item_1, AP_List);
+        ListAdap = new ArrayAdapter<String>(this, R.layout.customlistlayout, AP_List);
         LocList.setAdapter(ListAdap);
 
 
@@ -118,6 +118,7 @@ public class MapsActiv extends FragmentActivity implements OnMapReadyCallback {
         @Override
         public void run() {
 
+            float zIndex = 0;
             APS = w.getAPhm();
             Log.i("APS", "THIS IS" + APS.toString());
             Log.i("APS", "THIS IS LON" + APS.get("AP1LON"));
@@ -134,16 +135,19 @@ public class MapsActiv extends FragmentActivity implements OnMapReadyCallback {
                     double Sig1 = Double.parseDouble(APS.get("AP1LEVEL").toString());
                     double Freq1 = Double.parseDouble(APS.get("AP1FREQ").toString());
                     double Rad1 = calculateDistance(Sig1, Freq1);
+                    String sRad1 = String.valueOf(Rad1).substring(0,4);
 
-                    AP_List.add(APS.get("AP1").toString() + " " + APS.get("AP1TIME"));
+                    AP_List.add(APS.get("AP1").toString() + " " + APS.get("AP1TIME").toString().substring(0,20) + " User distance from:" + sRad1 + "m");
                     ListAdap.notifyDataSetChanged();
 
 
 
                     LatLng AP1 = new LatLng(AP1lat, AP1lon);
-                    mMap.addMarker(new MarkerOptions().position(AP1).title(APS.get("AP1").toString() + " " + APS.get("AP1TIME")));
+                    mMap.addMarker(new MarkerOptions().position(AP1).title(APS.get("AP1").toString() + " " + APS.get("AP1TIME"))).setZIndex(zIndex);
 
-                    Circle cir1 = mMap.addCircle(new CircleOptions().center(AP1).radius(Rad1).strokeColor(Color.RED).fillColor(Color.GREEN));
+                    Circle cir1 = mMap.addCircle(new CircleOptions().center(AP1).radius(Rad1).strokeColor(Color.RED).fillColor(Color.GREEN).zIndex(zIndex));
+
+                    zIndex += zIndex +1;
 
                 }catch (NumberFormatException e){
                     Log.e("NEexcep", "Marker 1");
@@ -163,11 +167,13 @@ public class MapsActiv extends FragmentActivity implements OnMapReadyCallback {
                 double Freq2 = Double.parseDouble(APS.get("AP2FREQ").toString());
 
                 double Rad2 = calculateDistance(Sig2, Freq2);
-                AP_List.add(APS.get("AP2").toString() + " " + APS.get("AP2TIME"));
+                String sRad2 = String.valueOf(Rad2).substring(0,4);
+
+                AP_List.add(APS.get("AP2").toString() + " " + APS.get("AP2TIME").toString().substring(0,20)+ " User distance from:" + sRad2 + "m");
                 ListAdap.notifyDataSetChanged();
 
-                mMap.addMarker(new MarkerOptions().position(AP2).title(APS.get("AP2").toString() + " " + APS.get("AP2TIME")));
-                Circle cir2 = mMap.addCircle(new CircleOptions().center(AP2).radius(Rad2).strokeColor(Color.RED).fillColor(Color.BLUE));
+                mMap.addMarker(new MarkerOptions().position(AP2).title(APS.get("AP2").toString() + " " + APS.get("AP2TIME"))).setZIndex(zIndex);
+                Circle cir2 = mMap.addCircle(new CircleOptions().center(AP2).radius(Rad2).strokeColor(Color.RED).fillColor(Color.BLUE).zIndex(zIndex));
 
                 }catch (NumberFormatException e){
                     Log.e("NEexcep", "Marker 2");
@@ -182,16 +188,19 @@ public class MapsActiv extends FragmentActivity implements OnMapReadyCallback {
                 Log.i("MAP", "COORDS 3 " + AP3lon + " " + AP3lat);
 
                 LatLng AP3 = new LatLng(AP3lat, AP3lon);
-                AP_List.add(APS.get("AP3").toString() + " " + APS.get("AP3TIME"));
-                ListAdap.notifyDataSetChanged();
+
 
                 double Sig3 = Double.parseDouble(APS.get("AP3LEVEL").toString());
                 double Freq3 = Double.parseDouble(APS.get("AP3FREQ").toString());
 
                 double Rad3 = calculateDistance(Sig3, Freq3);
+                String sRad3 = String.valueOf(Rad3).substring(0,4);
 
-                    mMap.addMarker(new MarkerOptions().position(AP3).title(APS.get("AP3").toString() + " " + APS.get("AP3TIME")));
-                Circle cir3 = mMap.addCircle(new CircleOptions().center(AP3).radius(Rad3).strokeColor(Color.RED).fillColor(Color.YELLOW));}
+                    AP_List.add(APS.get("AP3").toString() + " " + APS.get("AP3TIME").toString().substring(0,20)+ " User distance from:" + sRad3 + "m");
+                    ListAdap.notifyDataSetChanged();
+
+                    mMap.addMarker(new MarkerOptions().position(AP3).title(APS.get("AP3").toString() + " " + APS.get("AP3TIME"))).setZIndex(zIndex);
+                Circle cir3 = mMap.addCircle(new CircleOptions().center(AP3).radius(Rad3).strokeColor(Color.RED).fillColor(Color.YELLOW).zIndex(zIndex));}
                 catch (NumberFormatException e){
                     Log.e("NEexcep", "Marker 3");
                     }

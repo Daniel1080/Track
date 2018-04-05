@@ -6,6 +6,6 @@ package com.example.daniel.track;
 
 public interface login {
 
-    Boolean LoginUser(String Username, String Password);
+    void LoginUser(String Username, String Password);
 
 }
