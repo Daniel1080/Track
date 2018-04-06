@@ -300,7 +300,7 @@ public class User implements reg_user , login{
 
         Log.d("req user val" , "this is val req usrr" + reqUser);
         System.out.println("dbuser is " + dbUser + " requser is " + reqUser);
-        System.out.println(reqPass + " " + dbPass);
+        System.out.println("Req pass and DbPass " + reqPass + " " + dbPass);
 
         if(Objects.equals(dbUser, reqUser)) {
             System.out.println("Username matches");
@@ -311,15 +311,13 @@ public class User implements reg_user , login{
             Log.i("Username" , "Username does not match " + match);
             match = false;}
 
-        passMatch1 = dbPass.compareTo(reqPass);
-        passMatch2 = reqPass.compareTo(dbPass);
         Log.d("PASScheck", "These are the vals " + passMatch1 + " " + passMatch2);
-        passRes = passMatch1 + passMatch2;
+        //passRes = passMatch1 + passMatch2;
         Log.d("PASScheck", "Result is " + passRes);
 
-        if (passRes == 0){
+        if (Objects.equals(dbPass, reqPass)){
 
-            System.out.println("Pass Hashes match");
+            System.out.println("Pass Hashes match !!!!!");
             match2 = true;
             Log.i("match2 Val" , " " + match2);
         }

@@ -52,10 +52,10 @@ public class MainActivity extends AppCompatActivity {
         v.vibrate(450);
         startActivity(intent);
     }
-    public  void switchMap(int view){
+    public  void switchMap(int view, String Usr){
 
         Intent mapInt = new Intent(this, MapsActiv.class);
-
+        mapInt.putExtra("User", Usr );
         Vibrator v2 = (Vibrator) getSystemService(Context.VIBRATOR_SERVICE);
         v2.vibrate(500);
         startActivity(mapInt);
@@ -104,7 +104,7 @@ public class MainActivity extends AppCompatActivity {
 
         if(Authentication == true){
 
-            switchMap(R.layout.activity_maps);
+            switchMap(R.layout.activity_maps, txtUser.getText().toString());
         }
 
 

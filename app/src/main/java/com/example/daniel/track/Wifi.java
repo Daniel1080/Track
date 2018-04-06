@@ -1,11 +1,14 @@
 package com.example.daniel.track;
 
 import android.app.Activity;
+import android.app.IntentService;
 import android.content.Context;
+import android.content.Intent;
 import android.net.wifi.ScanResult;
 import android.net.wifi.WifiManager;
 import android.os.AsyncTask;
 import android.os.Process;
+import android.support.annotation.Nullable;
 import android.util.Log;
 
 import com.loopj.android.http.AsyncHttpClient;
@@ -30,7 +33,7 @@ import cz.msebera.android.httpclient.auth.AuthScope;
  * Created by Daniel on 13/02/2018.
  */
 
-public class Wifi extends User {
+public class Wifi  {
 
 
     public static String APurl = "https://api.wigle.net/api/v2/network/detail";
@@ -38,6 +41,13 @@ public class Wifi extends User {
     WifiManager wifiMan;
     AsyncHttpClient client = new AsyncHttpClient();
     public HashMap APhm = new HashMap();
+    public Context cont;
+
+    Wifi(Context cont){
+
+        this.cont = cont;
+
+    }
 
 
     public HashMap getAPhm() {
@@ -52,6 +62,8 @@ public class Wifi extends User {
         AsyncGetWifiNet a = new AsyncGetWifiNet();
         a.execute();
     }
+
+
 
 
     private class AsyncGetWifiNet extends AsyncTask<HashMap, Boolean, String> {
@@ -164,6 +176,14 @@ public class Wifi extends User {
                     APcount+=1;
                 }
 
+                Boolean ClientCHK = client.getThreadPool().isShutdown();
+
+                Log.d( "Checking Client" , ClientCHK.toString());
+
+
+                //((MapsActiv)cont).ExecuteULL();
+
+
                 Log.d("APHM", " " + APhm.toString());
             }
 
@@ -272,6 +292,7 @@ public class Wifi extends User {
                 @Override
                 public void onFailure(int statusCode, Header[] headers, Throwable e, JSONObject response) {
                     Log.d("Track", "Fail" + e.toString());
+
                 }
 
                 @Override

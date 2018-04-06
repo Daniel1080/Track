@@ -17,6 +17,7 @@ import android.widget.CompoundButton;
 import android.widget.ListAdapter;
 import android.widget.ListView;
 import android.widget.Switch;
+import android.widget.TextView;
 import android.widget.Toast;
 
 import com.google.android.gms.maps.CameraUpdate;
@@ -37,32 +38,40 @@ import java.util.List;
 
 import static com.example.daniel.track.R.id.mapView;
 
+
 public class MapsActiv extends FragmentActivity implements OnMapReadyCallback {
 
     GoogleMap mMap;
     Switch togTrk;
+    TextView txtTrkUser;
     ConnectivityManager conMgr;
     ListView LocList;
-    Wifi w = new Wifi();
+    Wifi w;
     HashMap APS = new HashMap();
     ArrayAdapter<String> ListAdap;
     List<String> AP_List;
+    String User;
 
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
 
-        Intent intent = getIntent();
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_maps);
         SupportMapFragment mapFragment = (SupportMapFragment) getSupportFragmentManager().findFragmentById(R.id.mapView);
         mapFragment.getMapAsync(this);
+        Intent intent = getIntent();
+        User = intent.getStringExtra("User");
         togTrk = (Switch) findViewById(R.id.swTrk);
+        txtTrkUser = (TextView) findViewById(R.id.txtTrkUsr);
+        txtTrkUser.setText(User);
         LocList = (ListView) findViewById(R.id.LocList);
+        w = new Wifi(this);
         conMgr = (ConnectivityManager) getSystemService(Context.CONNECTIVITY_SERVICE);
         AP_List = new ArrayList<String>(Arrays.asList(""));
         ListAdap = new ArrayAdapter<String>(this, R.layout.customlistlayout, AP_List);
         LocList.setAdapter(ListAdap);
+
 
 
         togTrk.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
@@ -93,7 +102,7 @@ public class MapsActiv extends FragmentActivity implements OnMapReadyCallback {
         if (togTrk.isChecked() == true) {
             Toast.makeText(this, "Tracking toggled!", Toast.LENGTH_SHORT).show();
         }
-        ;
+
         NetworkInfo netInf = conMgr.getActiveNetworkInfo();
         Log.d("NetConn", "con mgr started " + netInf);
         Log.d("Current Net", netInf.getState().toString());
@@ -105,11 +114,18 @@ public class MapsActiv extends FragmentActivity implements OnMapReadyCallback {
             Toast.makeText(this, "Connected!", Toast.LENGTH_LONG);
             Context WCont = this;
             w.GetWireless1(WCont);
-            UpdateLocList Up = new UpdateLocList();
-            Up.run();
+            ExecuteULL();
+
         } else {
             Toast.makeText(this, "Check Internet Connectivity!", Toast.LENGTH_LONG);
         }
+
+    }
+
+    public void ExecuteULL(){
+
+        UpdateLocList Up = new UpdateLocList();
+        Up.run();
 
     }
 
@@ -137,7 +153,7 @@ public class MapsActiv extends FragmentActivity implements OnMapReadyCallback {
                     double Rad1 = calculateDistance(Sig1, Freq1);
                     String sRad1 = String.valueOf(Rad1).substring(0,4);
 
-                    AP_List.add(APS.get("AP1").toString() + " " + APS.get("AP1TIME").toString().substring(0,20) + " User distance from:" + sRad1 + "m");
+                    AP_List.add(APS.get("AP1").toString() + " " + APS.get("AP1TIME").toString().substring(0,20) + " User distance from: " + sRad1 + "m");
                     ListAdap.notifyDataSetChanged();
 
 
@@ -169,7 +185,7 @@ public class MapsActiv extends FragmentActivity implements OnMapReadyCallback {
                 double Rad2 = calculateDistance(Sig2, Freq2);
                 String sRad2 = String.valueOf(Rad2).substring(0,4);
 
-                AP_List.add(APS.get("AP2").toString() + " " + APS.get("AP2TIME").toString().substring(0,20)+ " User distance from:" + sRad2 + "m");
+                AP_List.add(APS.get("AP2").toString() + " " + APS.get("AP2TIME").toString().substring(0,20)+ " User distance from: " + sRad2 + "m");
                 ListAdap.notifyDataSetChanged();
 
                 mMap.addMarker(new MarkerOptions().position(AP2).title(APS.get("AP2").toString() + " " + APS.get("AP2TIME"))).setZIndex(zIndex);
@@ -196,7 +212,7 @@ public class MapsActiv extends FragmentActivity implements OnMapReadyCallback {
                 double Rad3 = calculateDistance(Sig3, Freq3);
                 String sRad3 = String.valueOf(Rad3).substring(0,4);
 
-                    AP_List.add(APS.get("AP3").toString() + " " + APS.get("AP3TIME").toString().substring(0,20)+ " User distance from:" + sRad3 + "m");
+                    AP_List.add(APS.get("AP3").toString() + " " + APS.get("AP3TIME").toString().substring(0,20)+ " User distance from: " + sRad3 + "m");
                     ListAdap.notifyDataSetChanged();
 
                     mMap.addMarker(new MarkerOptions().position(AP3).title(APS.get("AP3").toString() + " " + APS.get("AP3TIME"))).setZIndex(zIndex);

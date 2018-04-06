@@ -39,6 +39,19 @@
             android:textSize="24sp"
             android:theme="@style/SwitchTheme" />
 
+        <TextView
+            android:id="@+id/txtTrkUsr"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginBottom="10dp"
+            android:layout_marginLeft="20dp"
+            android:layout_marginRight="10dp"
+            android:layout_marginTop="10dp"
+            android:fontFamily="@font/lato"
+            android:shadowColor="@color/colorMidBlue"
+            android:textColor="@color/colorPrimaryDark"
+            android:textSize="18sp" />
+
         <ListView
             android:id="@+id/LocList"
             android:layout_width="match_parent"
