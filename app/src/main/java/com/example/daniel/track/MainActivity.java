@@ -77,7 +77,7 @@ public class MainActivity extends AppCompatActivity {
 
         if (Usr.trim().length() < 3){
             usOK = false;
-            Toast.makeText(getApplicationContext(), "Please enter a username!",Toast.LENGTH_LONG).show();
+            Toast.makeText(getApplicationContext(), "Please enter a valid username!",Toast.LENGTH_LONG).show();
             txtPass.setText("");
             return;
         }

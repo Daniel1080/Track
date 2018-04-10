@@ -1,16 +1,23 @@
 package com.example.daniel.track;
 
+import android.content.BroadcastReceiver;
+import android.content.ComponentName;
 import android.content.Context;
 import android.content.Intent;
+import android.content.IntentFilter;
+import android.content.ServiceConnection;
 import android.graphics.Color;
 import android.net.ConnectivityManager;
 import android.net.NetworkInfo;
 import android.os.Handler;
+import android.os.IBinder;
 import android.os.Looper;
 import android.os.Message;
 import android.support.v4.app.FragmentActivity;
+import android.support.v4.content.LocalBroadcastManager;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
+import android.test.ServiceTestCase;
 import android.util.Log;
 import android.widget.ArrayAdapter;
 import android.widget.CompoundButton;
@@ -31,10 +38,13 @@ import com.google.android.gms.maps.model.CircleOptions;
 import com.google.android.gms.maps.model.LatLng;
 import com.google.android.gms.maps.model.MarkerOptions;
 
+import org.apache.commons.math3.analysis.function.Constant;
+
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
+import java.util.ServiceLoader;
 
 import static com.example.daniel.track.R.id.mapView;
 
@@ -51,6 +61,9 @@ public class MapsActiv extends FragmentActivity implements OnMapReadyCallback {
     ArrayAdapter<String> ListAdap;
     List<String> AP_List;
     String User;
+    WifiService WS;
+    boolean isBound = false;
+
 
 
     @Override
@@ -71,6 +84,13 @@ public class MapsActiv extends FragmentActivity implements OnMapReadyCallback {
         AP_List = new ArrayList<String>(Arrays.asList(""));
         ListAdap = new ArrayAdapter<String>(this, R.layout.customlistlayout, AP_List);
         LocList.setAdapter(ListAdap);
+        Respond respRec = new Respond();
+        IntentFilter statusFilt = new IntentFilter(Intent.ACTION_SEND);
+
+        LocalBroadcastManager.getInstance(this).registerReceiver(respRec, statusFilt);
+
+        Intent i = new Intent(this, WifiService.class);
+        bindService(i, mServiceConnection, Context.BIND_AUTO_CREATE);
 
 
 
@@ -113,8 +133,9 @@ public class MapsActiv extends FragmentActivity implements OnMapReadyCallback {
             Log.i("NetStatus", "Device has network access!");
             Toast.makeText(this, "Connected!", Toast.LENGTH_LONG);
             Context WCont = this;
-            w.GetWireless1(WCont);
-            ExecuteULL();
+            //w.GetWireless1(WCont);
+            //ExecuteULL();
+            WS.WifiEXECUTE(WCont);
 
         } else {
             Toast.makeText(this, "Check Internet Connectivity!", Toast.LENGTH_LONG);
@@ -135,7 +156,7 @@ public class MapsActiv extends FragmentActivity implements OnMapReadyCallback {
         public void run() {
 
             float zIndex = 0;
-            APS = w.getAPhm();
+          
             Log.i("APS", "THIS IS" + APS.toString());
             Log.i("APS", "THIS IS LON" + APS.get("AP1LON"));
             Log.i("APS", "THIS IS LAT" + APS.get("AP1LAT"));
@@ -225,13 +246,44 @@ public class MapsActiv extends FragmentActivity implements OnMapReadyCallback {
             }
 
         }
+    }
             //https://stackoverflow.com/questions/11217674/how-to-calculate-distance-from-wifi-router-using-signal-strength
         public double calculateDistance(double signalLevelInDb, double freqInMHz) {
             double exp = (27.55 - (20 * Math.log10(freqInMHz)) + Math.abs(signalLevelInDb)) / 20.0;
             return Math.pow(10.0, exp);
         }
 
+        private ServiceConnection mServiceConnection = new ServiceConnection() {
+            @Override
+            public void onServiceConnected(ComponentName componentName, IBinder service) {
+                WifiService.MyLocalBinder localbinder = (WifiService.MyLocalBinder) service;
+                WS = localbinder.getService();
+                isBound = true;
+            }
 
+            @Override
+            public void onServiceDisconnected(ComponentName componentName) {
+                isBound = false;
+            }
+        };
+
+    private class Respond extends BroadcastReceiver{
+
+
+        @Override
+        public void onReceive(Context context, Intent intent) {
+
+            Log.d("onRec", "On rec called!");
+            APS = (HashMap) intent.getSerializableExtra("APS");
+            Log.d("Onrec", "Rec APS "  + APS.toString());
+
+
+            ExecuteULL();
+        }
     }
+
+
+
+
 
 }
