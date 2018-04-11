@@ -73,6 +73,11 @@ public class MapsActiv extends FragmentActivity implements OnMapReadyCallback {
     boolean isBound = false;
 
 
+    @Override
+    protected void onPause() {
+        super.onPause();
+
+    }
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -112,7 +117,17 @@ public class MapsActiv extends FragmentActivity implements OnMapReadyCallback {
                 if (isChecked) {
                     toggleTracking();
                 }
-                else if(isChecked == false){ }
+                else if(isChecked == false){
+
+                    Intent MapstoService = new Intent(MapsActiv.this, WifiService.class);
+                    PendingIntent pendINT = PendingIntent.getService(getApplicationContext(), 0, MapstoService, 0);
+
+                    AlarmManager am2 = (AlarmManager) getSystemService(ALARM_SERVICE);
+                    am2.cancel(pendINT);
+
+                    Toast.makeText(getApplicationContext(), "Tracking Toggled Off!", Toast.LENGTH_SHORT).show();
+
+                }
 
             }
         });
@@ -299,7 +314,7 @@ public class MapsActiv extends FragmentActivity implements OnMapReadyCallback {
 
 
 
-            }catch (NumberFormatException e){Log.e("EXCEP", e.toString()); }
+            }catch (NullPointerException e2){Log.e("EXCEP", e2.toString()); }
 
         }
     }
