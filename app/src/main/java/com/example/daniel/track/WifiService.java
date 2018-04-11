@@ -42,11 +42,15 @@ public class WifiService extends Service {
 
     private final IBinder MapsWifiBind = new MyLocalBinder();
 
-    public WifiService() {
+
+
+
+    @Override
+    public int onStartCommand(Intent intent, int flags, int startId) {
+        Log.i("Service" , "Started Service!");
+        WifiEXECUTE(this);
+        return super.onStartCommand(intent, flags, startId);
     }
-
-
-
 
     public void WifiEXECUTE(final Context cont){
 
@@ -74,6 +78,7 @@ public class WifiService extends Service {
     @Override
     public void onCreate() {
         super.onCreate();
+        Log.i("SERVICE", "Oncreate called");
 
     }
 

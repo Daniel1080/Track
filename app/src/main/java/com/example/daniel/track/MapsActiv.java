@@ -1,5 +1,8 @@
 package com.example.daniel.track;
 
+import android.app.AlarmManager;
+import android.app.PendingIntent;
+import android.app.Service;
 import android.content.BroadcastReceiver;
 import android.content.ComponentName;
 import android.content.Context;
@@ -37,11 +40,16 @@ import com.google.android.gms.maps.model.Circle;
 import com.google.android.gms.maps.model.CircleOptions;
 import com.google.android.gms.maps.model.LatLng;
 import com.google.android.gms.maps.model.MarkerOptions;
+import com.lemmingapex.trilateration.NonLinearLeastSquaresSolver;
+import com.lemmingapex.trilateration.TrilaterationFunction;
 
 import org.apache.commons.math3.analysis.function.Constant;
+import org.apache.commons.math3.fitting.leastsquares.LeastSquaresOptimizer;
+import org.apache.commons.math3.fitting.leastsquares.LevenbergMarquardtOptimizer;
 
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Calendar;
 import java.util.HashMap;
 import java.util.List;
 import java.util.ServiceLoader;
@@ -87,6 +95,9 @@ public class MapsActiv extends FragmentActivity implements OnMapReadyCallback {
         Respond respRec = new Respond();
         IntentFilter statusFilt = new IntentFilter(Intent.ACTION_SEND);
 
+
+
+
         LocalBroadcastManager.getInstance(this).registerReceiver(respRec, statusFilt);
 
         Intent i = new Intent(this, WifiService.class);
@@ -101,6 +112,8 @@ public class MapsActiv extends FragmentActivity implements OnMapReadyCallback {
                 if (isChecked) {
                     toggleTracking();
                 }
+                else if(isChecked == false){ }
+
             }
         });
 
@@ -133,9 +146,26 @@ public class MapsActiv extends FragmentActivity implements OnMapReadyCallback {
             Log.i("NetStatus", "Device has network access!");
             Toast.makeText(this, "Connected!", Toast.LENGTH_LONG);
             Context WCont = this;
+
+
+
+            AlarmManager am = (AlarmManager) getSystemService(ALARM_SERVICE);
+
+            Calendar cal = Calendar.getInstance();
+
+
+            Intent MapstoService = new Intent(MapsActiv.this, WifiService.class);
+            PendingIntent pendINT = PendingIntent.getService(this, 0, MapstoService, 0);
+
+            long currTime = System.currentTimeMillis();
+            long tenMins =  30 * 1000;
+
+            am.setRepeating(AlarmManager.RTC, cal.getTimeInMillis(), tenMins, pendINT);
+            Log.d("ALARM ", am.getNextAlarmClock().toString());
+
             //w.GetWireless1(WCont);
             //ExecuteULL();
-            WS.WifiEXECUTE(WCont);
+           // WS.WifiEXECUTE(WCont);
 
         } else {
             Toast.makeText(this, "Check Internet Connectivity!", Toast.LENGTH_LONG);
@@ -156,10 +186,17 @@ public class MapsActiv extends FragmentActivity implements OnMapReadyCallback {
         public void run() {
 
             float zIndex = 0;
-          
+
             Log.i("APS", "THIS IS" + APS.toString());
             Log.i("APS", "THIS IS LON" + APS.get("AP1LON"));
             Log.i("APS", "THIS IS LAT" + APS.get("AP1LAT"));
+
+            LatLng AP1 = null;
+            LatLng AP2 = null;
+            LatLng AP3 = null;
+            double Rad1 = 0;
+            double Rad2 = 0;
+            double Rad3 = 0;
 
             if (APS.get("AP1LON") != null && APS.get("AP1LAT") != null) {
 
@@ -171,7 +208,7 @@ public class MapsActiv extends FragmentActivity implements OnMapReadyCallback {
 
                     double Sig1 = Double.parseDouble(APS.get("AP1LEVEL").toString());
                     double Freq1 = Double.parseDouble(APS.get("AP1FREQ").toString());
-                    double Rad1 = calculateDistance(Sig1, Freq1);
+                    Rad1 = calculateDistance(Sig1, Freq1);
                     String sRad1 = String.valueOf(Rad1).substring(0,4);
 
                     AP_List.add(APS.get("AP1").toString() + " " + APS.get("AP1TIME").toString().substring(0,20) + " User distance from: " + sRad1 + "m");
@@ -179,8 +216,9 @@ public class MapsActiv extends FragmentActivity implements OnMapReadyCallback {
 
 
 
-                    LatLng AP1 = new LatLng(AP1lat, AP1lon);
+                    AP1 = new LatLng(AP1lat, AP1lon);
                     mMap.addMarker(new MarkerOptions().position(AP1).title(APS.get("AP1").toString() + " " + APS.get("AP1TIME"))).setZIndex(zIndex);
+                    mMap.moveCamera(CameraUpdateFactory.newLatLngZoom(AP1, 15));
 
                     Circle cir1 = mMap.addCircle(new CircleOptions().center(AP1).radius(Rad1).strokeColor(Color.RED).fillColor(Color.GREEN).zIndex(zIndex));
 
@@ -199,11 +237,11 @@ public class MapsActiv extends FragmentActivity implements OnMapReadyCallback {
                 double AP2lon = Double.parseDouble(APS.get("AP2LON").toString());
                 Log.i("MAP", "COORDS 2 " + AP2lon + " " + AP2lat);
 
-                LatLng AP2 = new LatLng(AP2lat, AP2lon);
+                 AP2 = new LatLng(AP2lat, AP2lon);
                 double Sig2 = Double.parseDouble(APS.get("AP2LEVEL").toString());
                 double Freq2 = Double.parseDouble(APS.get("AP2FREQ").toString());
 
-                double Rad2 = calculateDistance(Sig2, Freq2);
+                 Rad2 = calculateDistance(Sig2, Freq2);
                 String sRad2 = String.valueOf(Rad2).substring(0,4);
 
                 AP_List.add(APS.get("AP2").toString() + " " + APS.get("AP2TIME").toString().substring(0,20)+ " User distance from: " + sRad2 + "m");
@@ -224,13 +262,13 @@ public class MapsActiv extends FragmentActivity implements OnMapReadyCallback {
                 double AP3lon = Double.parseDouble(APS.get("AP3LON").toString());
                 Log.i("MAP", "COORDS 3 " + AP3lon + " " + AP3lat);
 
-                LatLng AP3 = new LatLng(AP3lat, AP3lon);
+                AP3 = new LatLng(AP3lat, AP3lon);
 
 
                 double Sig3 = Double.parseDouble(APS.get("AP3LEVEL").toString());
                 double Freq3 = Double.parseDouble(APS.get("AP3FREQ").toString());
 
-                double Rad3 = calculateDistance(Sig3, Freq3);
+                Rad3 = calculateDistance(Sig3, Freq3);
                 String sRad3 = String.valueOf(Rad3).substring(0,4);
 
                     AP_List.add(APS.get("AP3").toString() + " " + APS.get("AP3TIME").toString().substring(0,20)+ " User distance from: " + sRad3 + "m");
@@ -241,9 +279,27 @@ public class MapsActiv extends FragmentActivity implements OnMapReadyCallback {
                 catch (NumberFormatException e){
                     Log.e("NEexcep", "Marker 3");
                     }
-
-
             }
+
+            try{
+
+                double [] [] positions = new double[][] {{AP1.latitude, AP1.longitude}, {AP2.latitude, AP2.longitude}, {AP3.latitude, AP3.longitude}};
+                double [] distances = new double[] {Rad1, Rad2, Rad3};
+
+                NonLinearLeastSquaresSolver solver = new NonLinearLeastSquaresSolver(new TrilaterationFunction(positions, distances), new LevenbergMarquardtOptimizer());
+                LeastSquaresOptimizer.Optimum optimum = solver.solve();
+                double [] centroid = optimum.getPoint().toArray();
+
+                Log.i("USER", "Assumed user loc is " + centroid[0] + " " + centroid[1] );
+
+                LatLng User = new LatLng(centroid[0], centroid[1]);
+
+                mMap.addMarker(new MarkerOptions().position(User).title("User"));
+
+
+
+
+            }catch (NumberFormatException e){Log.e("EXCEP", e.toString()); }
 
         }
     }
