@@ -176,11 +176,6 @@ public class MapsActiv extends FragmentActivity implements OnMapReadyCallback {
             long tenMins =  30 * 1000;
 
             am.setRepeating(AlarmManager.RTC, cal.getTimeInMillis(), tenMins, pendINT);
-            Log.d("ALARM ", am.getNextAlarmClock().toString());
-
-            //w.GetWireless1(WCont);
-            //ExecuteULL();
-           // WS.WifiEXECUTE(WCont);
 
         } else {
             Toast.makeText(this, "Check Internet Connectivity!", Toast.LENGTH_LONG);
@@ -201,6 +196,7 @@ public class MapsActiv extends FragmentActivity implements OnMapReadyCallback {
         public void run() {
 
             float zIndex = 0;
+            float userZ = 200;
 
             Log.i("APS", "THIS IS" + APS.toString());
             Log.i("APS", "THIS IS LON" + APS.get("AP1LON"));
@@ -298,6 +294,8 @@ public class MapsActiv extends FragmentActivity implements OnMapReadyCallback {
 
             try{
 
+
+
                 double [] [] positions = new double[][] {{AP1.latitude, AP1.longitude}, {AP2.latitude, AP2.longitude}, {AP3.latitude, AP3.longitude}};
                 double [] distances = new double[] {Rad1, Rad2, Rad3};
 
@@ -309,13 +307,16 @@ public class MapsActiv extends FragmentActivity implements OnMapReadyCallback {
 
                 LatLng User = new LatLng(centroid[0], centroid[1]);
 
-                mMap.addMarker(new MarkerOptions().position(User).title("User"));
+                mMap.addMarker(new MarkerOptions().position(User).title("User").zIndex(userZ));
+
+
 
 
 
 
             }catch (NullPointerException e2){Log.e("EXCEP", e2.toString()); }
 
+            userZ = userZ + 50;
         }
     }
             //https://stackoverflow.com/questions/11217674/how-to-calculate-distance-from-wifi-router-using-signal-strength
