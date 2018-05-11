@@ -106,6 +106,7 @@ public class MainActivity extends AppCompatActivity {
 
             switchMap(R.layout.activity_maps, txtUser.getText().toString());
         }
+        else{Toast.makeText(getApplicationContext(), "Authentication Failed!", Toast.LENGTH_LONG).show();}
 
 
     }

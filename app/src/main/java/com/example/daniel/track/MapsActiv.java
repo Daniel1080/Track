@@ -1,5 +1,6 @@
 package com.example.daniel.track;
 
+
 import android.app.AlarmManager;
 import android.app.PendingIntent;
 import android.app.Service;
@@ -30,6 +31,7 @@ import android.widget.Switch;
 import android.widget.TextView;
 import android.widget.Toast;
 
+
 import com.google.android.gms.maps.CameraUpdate;
 import com.google.android.gms.maps.CameraUpdateFactory;
 import com.google.android.gms.maps.GoogleMap;
@@ -46,6 +48,7 @@ import com.lemmingapex.trilateration.TrilaterationFunction;
 import org.apache.commons.math3.analysis.function.Constant;
 import org.apache.commons.math3.fitting.leastsquares.LeastSquaresOptimizer;
 import org.apache.commons.math3.fitting.leastsquares.LevenbergMarquardtOptimizer;
+import org.apache.commons.math3.geometry.euclidean.twod.Vector2D;
 
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -53,6 +56,8 @@ import java.util.Calendar;
 import java.util.HashMap;
 import java.util.List;
 import java.util.ServiceLoader;
+import java.util.Vector;
+
 
 import static com.example.daniel.track.R.id.mapView;
 
@@ -309,15 +314,34 @@ public class MapsActiv extends FragmentActivity implements OnMapReadyCallback {
 
                 mMap.addMarker(new MarkerOptions().position(User).title("User").zIndex(userZ));
 
-
-
-
-
+                AP_List.add("User Location" + APS.get("AP3TIME").toString().substring(0,20)+ " Coords " + User.toString());
+                ListAdap.notifyDataSetChanged();
 
             }catch (NullPointerException e2){Log.e("EXCEP", e2.toString()); }
 
-            userZ = userZ + 50;
+            try{
+
+                double UserPluslat = Double.parseDouble(APS.get("userLAT").toString());
+                double UserPluslon = Double.parseDouble(APS.get("userLON").toString());
+
+
+                LatLng UserPlus = new LatLng(UserPluslat, UserPluslon);
+
+                userZ = userZ +2;
+
+                mMap.addMarker(new MarkerOptions().position(UserPlus).title("UserPlus").zIndex(userZ));
+                AP_List.add("User Location Plus" + APS.get("AP3TIME").toString().substring(0,20)+ " Coords " + UserPlus.toString());
+                ListAdap.notifyDataSetChanged();
+
+
+
+
+
+            }catch (NullPointerException e3){Log.e("EXCEP", e3.toString());}
+
+
         }
+
     }
             //https://stackoverflow.com/questions/11217674/how-to-calculate-distance-from-wifi-router-using-signal-strength
         public double calculateDistance(double signalLevelInDb, double freqInMHz) {

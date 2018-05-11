@@ -19,7 +19,7 @@ android {
 }
 
 dependencies {
-    implementation fileTree(dir: 'libs', include: ['*.jar'])
+    implementation fileTree(include: ['*.jar'], dir: 'libs')
     implementation 'com.android.support:appcompat-v7:26.1.0'
     implementation 'com.android.support.constraint:constraint-layout:1.0.2'
     testImplementation 'junit:junit:4.12'
@@ -30,4 +30,6 @@ dependencies {
     compile 'com.lemmingapex.trilateration:trilateration:1.0.2'
     compile 'com.squareup.retrofit2:retrofit:2.0.0-beta4'
     compile 'io.reactivex.rxjava2:rxjava:2.1.12'
+    implementation 'com.squareup.okhttp3:okhttp:3.10.0'
+    implementation project(':DelaunayTriangulator-1.0.3')
 }

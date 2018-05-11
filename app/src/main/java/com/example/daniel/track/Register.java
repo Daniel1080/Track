@@ -35,6 +35,7 @@ public class Register extends AppCompatActivity{
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_register);
         Intent intent = getIntent();
+        final Intent mainIntent = new Intent(this, MainActivity.class);
 
         txtUser = (EditText) findViewById(R.id.txtUserR);
         txtPass = (EditText) findViewById(R.id.txtPass);
@@ -67,6 +68,13 @@ public class Register extends AppCompatActivity{
                     txtEmail.setText("");
                     txtName.setText("");
                 }
+
+            }
+        });
+        btnBack.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                startActivity(mainIntent);
 
             }
         });

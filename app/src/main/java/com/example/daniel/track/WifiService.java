@@ -20,6 +20,8 @@ import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 
+import java.io.IOException;
+import java.io.UnsupportedEncodingException;
 import java.util.Calendar;
 import java.util.Collections;
 import java.util.Comparator;
@@ -29,14 +31,29 @@ import java.util.List;
 
 import cz.msebera.android.httpclient.Header;
 import cz.msebera.android.httpclient.auth.AuthScope;
+import cz.msebera.android.httpclient.entity.StringEntity;
+import cz.msebera.android.httpclient.message.BasicHeader;
+import cz.msebera.android.httpclient.protocol.HttpContext;
+import okhttp3.Call;
+import okhttp3.Callback;
+import okhttp3.MediaType;
+import okhttp3.OkHttpClient;
+import okhttp3.Request;
+import okhttp3.RequestBody;
+import okhttp3.Response;
+import retrofit2.http.HTTP;
 
 public class WifiService extends Service {
 
     public static String APurl = "https://api.wigle.net/api/v2/network/detail";
+    public static String PythonURL = "http://35.178.107.39/location";
     public Boolean success = false;
     WifiManager wifiMan;
     SyncHttpClient client = new SyncHttpClient();
+    SyncHttpClient client2 = new SyncHttpClient();
     public HashMap APhm = new HashMap();
+    double userLON = 0;
+    double userLAT = 0;
     //Context cont;
 
 
@@ -58,6 +75,7 @@ public class WifiService extends Service {
             public void run() {
                 getWirelessInfo1(cont);
                 GetWigleCall();
+                tryUserLocation();
 
                 Intent local = new Intent(Intent.ACTION_SEND).putExtra("APS", APhm);
                 LocalBroadcastManager.getInstance(getApplicationContext()).sendBroadcast(local);
@@ -270,6 +288,92 @@ public class WifiService extends Service {
 
         });
 
+    }
+    public void tryUserLocation(){
+
+
+
+
+            JSONObject UserReq = new JSONObject();
+            StringEntity ReqEnt = null;
+
+        try {
+
+
+            UserReq.put("AP1" , APhm.get("AP1").toString());
+            UserReq.put("AP1lon" , APhm.get("AP1LON").toString());
+            UserReq.put("AP1lat", APhm.get("AP1LAT").toString());
+
+            double AP1LEVEL = Double.parseDouble(APhm.get("AP1LEVEL").toString());
+            double AP1FREQUENCY = Double.parseDouble(APhm.get("AP1FREQ").toString());
+
+            UserReq.put("AP1dist" , calculateDistance( AP1LEVEL, AP1FREQUENCY));
+            UserReq.put("AP2" , APhm.get("AP2"));
+            UserReq.put("AP2lon" , APhm.get("AP2LON").toString());
+            UserReq.put("AP2lat", APhm.get("AP2LAT").toString());
+
+            double AP2LEVEL = Double.parseDouble(APhm.get("AP2LEVEL").toString());
+            double AP2FREQUENCY = Double.parseDouble(APhm.get("AP2FREQ").toString());
+
+            UserReq.put("AP2dist" , calculateDistance(AP2LEVEL, AP2FREQUENCY));
+
+            UserReq.put("AP3" , APhm.get("AP3").toString());
+            UserReq.put("AP3lon" , APhm.get("AP3LON").toString());
+            UserReq.put("AP3lat", APhm.get("AP3LAT").toString());
+
+            double AP3LEVEL = Double.parseDouble(APhm.get("AP3LEVEL").toString());
+            double AP3FREQUENCY = Double.parseDouble(APhm.get("AP3FREQ").toString());
+
+            UserReq.put("AP3dist" , calculateDistance( AP3LEVEL, AP3FREQUENCY));
+
+        } catch (JSONException e) {
+            e.printStackTrace();
+        }
+
+
+        Context web = this.getApplicationContext();
+
+
+        RequestParams jsparams = new RequestParams( "json", UserReq.toString());
+
+        MediaType JSON = MediaType.parse("application/json; charset=utf-8");
+
+        OkHttpClient ok = new OkHttpClient();
+
+        RequestBody body = RequestBody.create(JSON, UserReq.toString());
+        Request req = new Request.Builder().url(PythonURL).post(body).addHeader("content-type", "application/json").build();
+
+        ok.newCall(req).enqueue(new Callback() {
+            @Override
+            public void onFailure(Call call, IOException e) {
+
+            }
+
+            @Override
+            public void onResponse(Call call, Response response) throws IOException {
+
+                String UserResponse = response.body().string();
+
+                Log.i("JSON Response " , "Resp " + UserResponse);
+
+//                userLON = (double) response.body().string("lon");
+//                userLAT = (double) response.get("lat");
+//
+//
+//
+//                APhm.put("userLON", userLON);
+//                APhm.put("userLAT", userLAT);
+            }
+        });
+
+
+
+
+    }
+
+    public double calculateDistance(double signalLevelInDb, double freqInMHz) {
+        double exp = (27.55 - (20 * Math.log10(freqInMHz)) + Math.abs(signalLevelInDb)) / 20.0;
+        return Math.pow(10.0, exp);
     }
 }
 

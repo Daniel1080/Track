@@ -1,1 +1,1 @@
-include ':app'
+include ':app', ':example', ':triang', ':DelaunayTriangulator-1.0.3'
